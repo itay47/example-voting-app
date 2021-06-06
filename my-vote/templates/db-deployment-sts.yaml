@@ -1,3 +1,6 @@
+##################
+# STS deployment #
+##################
 apiVersion: apps/v1
 kind: StatefullSet
 metadata:
@@ -32,11 +35,49 @@ spec:
       volumes:
       - name: db-data
         emptyDir: {} 
+
+##########################
+# create a storage class #
+##########################
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: fast
 provisioner: microk8s.io/hostpath
-parameters:
-  type: pd-ssd
+volumeBindingMode: Immediate
+
+###################################
+# create a Persistant Volume (PV) #
+###################################
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: base
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+
+#########################################
+# create a Persistant Volume Claim(PVC) #
+#########################################
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: task-pv-claim
+spec:
+  storageClassName: base
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
