@@ -44,7 +44,7 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: pgsql-pv-strgclass
-provisioner: microk8s.io/hostpath
+provisioner: microk8s.io/hostpath # needs "microk8s enable storage"
 volumeBindingMode: Immediate
 
 ###################################
@@ -82,3 +82,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
+
+# helpfull resources:
+# https://stackoverflow.com/questions/58615019/how-to-change-a-kubernetes-hostpath-provisioner-mount-path
