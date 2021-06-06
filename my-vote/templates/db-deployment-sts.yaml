@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefullSet
 metadata:
   labels:
     app: db
@@ -32,3 +32,11 @@ spec:
       volumes:
       - name: db-data
         emptyDir: {} 
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast
+provisioner: microk8s.io/hostpath
+parameters:
+  type: pd-ssd
