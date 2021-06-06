@@ -10,6 +10,7 @@ metadata:
   namespace: vote
 spec:
   replicas: 1
+  serviceName: db
   selector:
     matchLabels:
       app: db
