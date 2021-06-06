@@ -34,7 +34,9 @@ spec:
           name: db-data
       volumes:
       - name: db-data
-        emptyDir: {} 
+        #emptyDir: {} 
+        persistentVolumeClaim:
+          claimName: pgsql-pv-claim
 
 ##########################
 # create a storage class #
