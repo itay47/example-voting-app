@@ -65,7 +65,7 @@ metadata:
 spec:
   storageClassName: pgsql-pv-strgclass
   capacity:
-    storage: 1Gi
+    storage: 10Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
@@ -87,7 +87,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 3Gi
 
 
 # helpfull resources:
