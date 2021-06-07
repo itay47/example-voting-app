@@ -16,7 +16,7 @@ spec:
         app: vote
     spec:
       containers:
-      - image: dockersamples/examplevotingapp_vote:before
+      - image: itay47/voting-app:Worker_core31
         name: vote
         ports:
         - containerPort: 80
