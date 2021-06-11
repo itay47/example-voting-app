@@ -1,0 +1,94 @@
+pipeline {
+  agent any
+  stages {
+
+    stage ('Git Checkout') {
+      steps {
+              git "https://github.com/itay47/example-voting-app.git"
+            }
+      }
+
+    stage('TF init & validate') {
+
+      steps {
+          sh '''
+          if [ -d "example-voting-app/TF_GCP/Provision_GKE/" ]; then
+            cd example-voting-app/TF_GCP/Provision_GKE
+            terraform init
+            terraform validate
+          else
+            for dir in example-voting-app/TF_GCP/Provision_GKE/*/
+            do 
+              cd ${dir}
+              env=${dir%*/}
+              env=${env#*/}
+              echo ""
+              echo "*************** TERRAFOM INIT and VALIDATE ******************"
+              echo "******* At environment: ${env} ********"
+              echo "*************************************************"
+              terraform init || exit 1
+              terraform validate || exit 1
+              cd ../../../
+            done
+          fi'''
+        }
+    }
+
+    stage('TF plan') {
+
+      steps {
+
+          sh '''
+          if [ -d "example-voting-app/TF_GCP/Provision_GKE/" ]; then
+            cd example-voting-app/TF_GCP/Provision_GKE
+            terraform plan
+          else
+            for dir in example-pipelines/environments/*/
+            do 
+              cd ${dir}
+              env=${dir%*/}
+              env=${env#*/}
+              echo ""
+              echo "*************** TERRAFOM PLAN ******************"
+              echo "******* At environment: ${env} ********"
+              echo "*************************************************"
+              terraform plan || exit 1
+              cd ../../../
+            done
+          fi
+          '''
+        }
+    }
+
+    stage('TF Apply') {
+      input {
+        message "Deploy to GCP and create the GKE cluster?"
+      }
+
+      steps {
+        container('terraform') {
+          sh '''
+          if [ -d "example-voting-app/TF_GCP/Provision_GKE/" ]; then
+            cd example-voting-app/TF_GCP/Provision_GKE
+            terraform apply -input=false -auto-approve
+          else
+            echo "*************** SKIPPING APPLY ******************"
+            echo "Dployment of TF GKE was not approved!"
+            echo "*************************************************"
+          fi
+          '''
+        }
+      }
+      post{
+
+        success{
+          echo "====++++ GKE cluster created successfully ++++===="
+
+        }
+       failure{
+           echo "====++++ GKE cluster create failed ++++===="
+       }
+     }
+    }
+  }
+}
