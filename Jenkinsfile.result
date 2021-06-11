@@ -1,0 +1,108 @@
+pipeline {
+  agent any
+  environment{
+        BUILD_TAG = 'NO-TAG'
+    }
+  stages {
+    
+    stage ('Git Checkout') {
+      steps {
+              git "https://github.com/itay47/example-voting-app.git"
+            }
+      }
+
+    stage('Build result') {
+      input {
+                message "Enter build number"
+                ok "Start!"
+                submitter "Mr. Jenkins"
+                parameters {
+                    string(name: 'BUILD_ID', defaultValue: 'latest', description: 'Build Number for tag: 0.x.y / string')
+                }
+            }
+
+      steps{
+                echo "====++++ building docker image 'result' ++++===="
+                script{
+                    BUILD_TAG = "${BUILD_ID}"
+                    echo "${BUILD_TAG}"
+                    //sh "docker build -t itay47/voting-app:result_$ ./result"
+                    sh "docker build -t itay47/voting-app:result_$BUILD_TAG -t shechter47.mooo.com:8181/voting-app:result_$BUILD_TAG ./result"
+                }
+            }
+            
+            post{
+                success{
+                    echo "====++++ build success ++++===="
+
+                    script{
+                        sh 'docker images'
+                    }
+                }
+                failure{
+                    echo "====++++ build execution failed ++++===="
+                }
+            }
+    } 
+
+    
+    stage('upload to dockerhub') {
+
+     input {
+        message "Upload to Docker registry?"
+     }
+
+      steps {
+        withDockerRegistry(credentialsId: 'dockerhub-creds', url:'') {
+          sh 'docker push itay47/voting-app:result_$BUILD_TAG'
+        }
+      }
+    }
+
+
+    stage("upload to nexus artifactory"){
+            
+            input {
+                message "Upload to Nexus artifactory?"
+            }
+            
+            steps{
+                echo "====++++ uploading to nexus artifactory ++++===="
+                
+                script{
+                    echo "login to nexus..."
+                    //https://blog.sonatype.com/using-nexus-3-as-your-repository-part-3-docker-images
+
+                    withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'NEXUS_CRED_PSW', usernameVariable: 'NEXUS_CRED_USR')]) {
+
+                        sh 'docker login -u $NEXUS_CRED_USR -p $NEXUS_CRED_PSW http://shechter47.mooo.com:8181'
+                    
+                        try {
+                            sh "docker push shechter47.mooo.com:8181/voting-app:result_$BUILD_TAG"
+                        }
+                        catch (exception) {
+                            echo 'Exception: $exception'
+                        }
+                    }
+                }
+            }
+
+            post{
+                success{
+                    echo "====++++ Upload to registry success ++++===="
+
+                    script{
+                        //logout the registry
+                        sh "docker logout"
+                        
+                        //remove local images to cleanup storage 
+                        sh "docker rmi itay47/voting-app:result_$BUILD_TAG shechter47.mooo.com:8181/voting-app:result_$BUILD_TAG"
+                    }
+                }
+                failure{
+                    echo "====++++ Upload to registry failed ++++===="
+                }
+            }
+        }
+    }
+}

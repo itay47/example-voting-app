@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: vote
-  name: vote
-  namespace: vote
+    app: {{- include "my-vote.labels" . | nindent 4 }} #vote
+  name: {{ include "my-vote.fullname" . }} #vote
+  namespace: {{ include "my-vote.namespace" }}  #vote
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: vote
+      app: {{- include "my-vote.selectorLabels" . | nindent 6 }} #vote
   template:
     metadata:
       labels:
-        app: vote
+        app: {{- include "my-vote.selectorLabels" . | nindent 8 }} #vote
     spec:
       containers:
-      - image: itay47/voting-app:Worker_core31
-        name: vote
+      - image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}" #itay47/voting-app:Worker_core31
+        name: {{ .Chart.Name }} #vote
         ports:
         - containerPort: 80
           name: vote
