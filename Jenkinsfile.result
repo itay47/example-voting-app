@@ -76,7 +76,7 @@ pipeline {
 
                     withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'NEXUS_CRED_PSW', usernameVariable: 'NEXUS_CRED_USR')]) {
 
-                        sh "docker login -u $NEXUS_CRED_USR -p $NEXUS_CRED_PSW http://shechter47.mooo.com:8181"
+                        sh "docker login -u $NEXUS_CRED_USR -p $NEXUS_CRED_PSW http://shechter47.mooo.com:9047"
                     
                         try {
                             sh "docker push shechter47.mooo.com:9047/voting-app:result_$BUILD_TAG"
@@ -97,7 +97,7 @@ pipeline {
                         sh "docker logout"
                         
                         //remove local images to cleanup storage 
-                        sh "docker rmi itay47/voting-app:result_$BUILD_TAG shechter47.mooo.com:8181/voting-app:result_$BUILD_TAG"
+                        sh "docker rmi itay47/voting-app:result_$BUILD_TAG shechter47.mooo.com:9047/voting-app:result_$BUILD_TAG"
                     }
                 }
                 failure{
