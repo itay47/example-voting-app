@@ -94,7 +94,7 @@ pipeline {
 
                     script{
                         //logout the registry
-                        sh "docker logout"
+                        sh "docker logout http://shechter47.mooo.com:9047"
                         
                         //remove local images to cleanup storage 
                         sh "docker rmi itay47/voting-app:result_$BUILD_TAG shechter47.mooo.com:9047/voting-app:result_$BUILD_TAG"
@@ -102,6 +102,9 @@ pipeline {
                 }
                 failure{
                     echo "====++++ Upload to registry failed ++++===="
+                    
+                    //remove local images to cleanup storage 
+                    sh "docker rmi itay47/voting-app:result_$BUILD_TAG shechter47.mooo.com:9047/voting-app:result_$BUILD_TAG"
                 }
             }
         }

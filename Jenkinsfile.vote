@@ -27,7 +27,7 @@ pipeline {
                     BUILD_TAG = "${BUILD_ID}"
                     echo "${BUILD_TAG}"
                     //sh "docker build -t itay47/voting-app:vote_$ ./vote"
-                    sh "docker build -t itay47/voting-app:vote_$BUILD_TAG -t shechter47.mooo.com:8181/voting-app:vote_$BUILD_TAG ./vote"
+                    sh "docker build -t itay47/voting-app:vote_$BUILD_TAG -t shechter47.mooo.com:9047/voting-app:vote_$BUILD_TAG ./vote"
                 }
             }
             
@@ -54,7 +54,8 @@ pipeline {
 
       steps {
         withDockerRegistry(credentialsId: 'dockerhub-creds', url:'') {
-          sh 'docker push itay47/voting-app:vote_$BUILD_TAG'
+          echo "${BUILD_TAG}"
+          sh "docker push itay47/voting-app:vote_$BUILD_TAG"
         }
       }
     }
@@ -75,10 +76,10 @@ pipeline {
 
                     withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'NEXUS_CRED_PSW', usernameVariable: 'NEXUS_CRED_USR')]) {
 
-                        sh 'docker login -u $NEXUS_CRED_USR -p $NEXUS_CRED_PSW http://shechter47.mooo.com:8181'
+                        sh "docker login -u $NEXUS_CRED_USR -p $NEXUS_CRED_PSW http://shechter47.mooo.com:9047"
                     
                         try {
-                            sh "docker push shechter47.mooo.com:8181/voting-app:vote_$BUILD_TAG"
+                            sh "docker push shechter47.mooo.com:9047/voting-app:vote_$BUILD_TAG"
                         }
                         catch (exception) {
                             echo 'Exception: $exception'
@@ -93,14 +94,17 @@ pipeline {
 
                     script{
                         //logout the registry
-                        sh "docker logout"
+                        sh "docker logout http://shechter47.mooo.com:9047"
                         
                         //remove local images to cleanup storage 
-                        sh "docker rmi itay47/voting-app:vote_$BUILD_TAG shechter47.mooo.com:8181/voting-app:vote_$BUILD_TAG"
+                        sh "docker rmi itay47/voting-app:vote_$BUILD_TAG shechter47.mooo.com:9047/voting-app:vote_$BUILD_TAG"
                     }
                 }
                 failure{
                     echo "====++++ Upload to registry failed ++++===="
+                    
+                    //remove local images to cleanup storage 
+                    sh "docker rmi itay47/voting-app:vote_$BUILD_TAG shechter47.mooo.com:9047/voting-app:vote_$BUILD_TAG"
                 }
             }
         }
