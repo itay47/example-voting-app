@@ -1,10 +1,14 @@
 pipeline {
   agent any
+  environment {
+  work_dir = 'nothing'
+  }
   stages {
 
     stage ('Git Checkout') {
       steps {
               git "https://github.com/itay47/example-voting-app.git"
+              $work_dir = sh '$(pwd)'
             }
       }
 
@@ -24,7 +28,7 @@ pipeline {
       steps {
           
           sh '''
-          if [ -d "TF_GCP/Provision_GKE/" ]; then
+          if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
             cd TF_GCP/Provision_GKE/
             terraform init
             terraform validate
