@@ -1,0 +1,68 @@
+pipeline {
+  agent any
+
+  environment {
+    TF_WORKDIR = "${env.WORKSPACE}/TF_GCP/Provision_GKE" //Sets the Terraform Workspace
+    TF_IN_AUTOMATION = 'true'
+  }
+  
+  stages {
+
+    stage ('Git Checkout') {
+      steps {
+        git "https://github.com/itay47/example-voting-app.git"
+      }
+    }
+    
+    stage('TF init & validate') {
+
+      steps {
+        dir('/TF_GCP/Provision_GKE/'){
+          sh 'echo --- $(pwd)  ----'
+          sh 'ls'
+          sh '''
+              terraform init
+              terraform validate
+              ls
+          '''
+        }
+      }
+    }
+
+    stage('TF plan') {
+
+      steps {
+        dir('/TF_GCP/Provision_GKE/'){
+          sh 'echo --- $(pwd)  ----'
+        
+          sh 'terraform plan'
+        }
+      }
+    }
+
+    stage('TF Apply') {
+      input {
+        message "Deploy to GCP and create the GKE cluster?"
+      }
+
+      steps {
+          dir('/TF_GCP/Provision_GKE/'){
+            sh 'echo --- $(pwd)  ----'
+        
+            sh 'terraform apply -input=false -auto-approve'
+        }
+      }
+      post{
+
+        success{
+          echo "====++++ GKE cluster created successfully ++++===="
+        }
+        
+        failure{
+            echo "====++++ GKE cluster create failed ++++===="
+       }
+
+     }
+    }
+  }
+}
