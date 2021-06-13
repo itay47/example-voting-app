@@ -11,26 +11,28 @@ pipeline {
     stage('TF init & validate') {
 
       steps {
-          sh '''
-          if [ -d example-voting-app/TF_GCP/Provision_GKE/ ]; then
-            cd example-voting-app/TF_GCP/Provision_GKE/
-            terraform init
-            terraform validate
-          else
-            for dir in example-voting-app/TF_GCP/Provision_GKE/
-            do 
-              cd ${dir}
-              env=${dir%*/}
-              env=${env#*/}
-              echo ""
-              echo "*************** TERRAFOM INIT and VALIDATE ******************"
-              echo "******* At environment: ${env} ********"
-              echo "*************************************************"
-              terraform init || exit 1
-              terraform validate || exit 1
-              cd ../../../
-            done
-          fi'''
+          sh 'cd example-voting-app/TF_GCP/Provision_GKE/'
+          sh 'ls'
+          //sh '''
+          //if [ -d example-voting-app/TF_GCP/Provision_GKE/ ]; then
+          //  cd example-voting-app/TF_GCP/Provision_GKE/
+          //  terraform init
+          //  terraform validate
+         // else
+         //   for dir in example-voting-app/TF_GCP/Provision_GKE/
+         //   do 
+         //     cd ${dir}
+         //     env=${dir%*/}
+         //     env=${env#*/}
+         //     echo ""
+         //     echo "*************** TERRAFOM INIT and VALIDATE ******************"
+         //     echo "******* At environment: ${env} ********"
+         //     echo "*************************************************"
+         //     terraform init || exit 1
+         //     terraform validate || exit 1
+         //     cd ../../../
+         //   done
+        //  fi'''
         }
     }
 
