@@ -54,6 +54,16 @@ resource "google_container_node_pool" "primary_nodes" {
   }
 }
 
+terraform {
+  backend "artifactory" {
+    # URL of the nexus repository
+    url      = "http://shechter47.mooo.com:8181/repository" 
+    # the repository name you just created
+    repo     = "TF-repo" 
+    # an unique path to for identification
+    subpath  = "GKE-TF-STATE"
+  }
+}
 
 # # Kubernetes provider
 # # The Terraform Kubernetes Provider configuration below is used as a learning reference only. 
