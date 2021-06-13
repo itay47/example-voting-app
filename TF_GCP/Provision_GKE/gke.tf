@@ -66,7 +66,12 @@ resource "google_container_node_pool" "primary_nodes" {
 }
 
 terraform {
-  backend "artifactory" {
+  backend "artifactory" {}
+}
+
+data "terraform_remote_state" "state" {
+  backend = "artifactory"
+  config {
     # URL of the nexus repository
     url      = "http://shechter47.mooo.com:8181/repository" 
     # the repository name you just created
