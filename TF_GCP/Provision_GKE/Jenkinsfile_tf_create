@@ -13,6 +13,7 @@ pipeline {
         sh '''
           #!/bin/bash
           echo "we are here: $(pwd)"
+          ls
         '''
        }
     }
