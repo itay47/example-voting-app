@@ -13,6 +13,7 @@ pipeline {
               WORK_DIR = sh ('$(pwd)')
             }
       }
+  }
 
     stage('itay test') {
       steps {
