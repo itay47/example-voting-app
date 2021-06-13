@@ -9,10 +9,12 @@ pipeline {
       }
 
     stage('itay test') {
+      steps {
         sh '''
           #!/bin/bash
           echo "we are here: $(pwd)"
         '''
+       }
     }
     
     stage('TF init & validate') {
