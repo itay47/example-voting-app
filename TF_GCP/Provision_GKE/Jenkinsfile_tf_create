@@ -1,14 +1,16 @@
 pipeline {
   agent any
+  
   environment {
-  work_dir = 'nothing'
+    work_dir = 'nothing'
   }
+  
   stages {
 
     stage ('Git Checkout') {
       steps {
               git "https://github.com/itay47/example-voting-app.git"
-              $work_dir = sh '$(pwd)'
+              work_dir = sh '$(pwd)'
             }
       }
 
