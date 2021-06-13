@@ -10,7 +10,7 @@ pipeline {
     stage ('Git Checkout') {
       steps {
               git "https://github.com/itay47/example-voting-app.git"
-              WORK_DIR = $(pwd)
+              //WORK_DIR = $(pwd)
             }
       }
 
