@@ -31,7 +31,7 @@ pipeline {
           
           sh '''
           if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
-            cd TF_GCP/Provision_GKE/
+            cd $(pwd)/TF_GCP/Provision_GKE/
             terraform init
             terraform validate
           else
@@ -46,8 +46,8 @@ pipeline {
       steps {
 
           sh '''
-          if [ -d "TF_GCP/Provision_GKE/" ]; then
-            cd TF_GCP/Provision_GKE
+          if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
+            cd $(pwd)/TF_GCP/Provision_GKE
             terraform plan
           else
               exit 1
@@ -65,8 +65,8 @@ pipeline {
       steps {
         container('terraform') {
           sh '''
-          if [ -d "TF_GCP/Provision_GKE/" ]; then
-            cd TF_GCP/Provision_GKE
+          if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
+            cd $(pwd)/TF_GCP/Provision_GKE
             terraform apply -input=false -auto-approve
           else
             echo "*************** SKIPPING APPLY ******************"
