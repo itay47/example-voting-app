@@ -13,7 +13,7 @@ pipeline {
       steps {
           sh '''
           if [ -d "example-voting-app/TF_GCP/Provision_GKE/" ]; then
-            cd example-voting-app/TF_GCP/Provision_GKE
+            cd example-voting-app/TF_GCP/Provision_GKE/
             terraform init
             terraform validate
           else
