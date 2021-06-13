@@ -14,55 +14,26 @@ pipeline {
       }
     }
     
-    stage('TF init & validate') {
-
+    stage('Terraform Init') {
       steps {
-        dir('/TF_GCP/Provision_GKE/'){
-          sh 'echo --- $(pwd)  ----'
-          sh 'ls'
-          sh '''
-              terraform init
-              terraform validate
-              ls
-          '''
-        }
+        sh "terraform -chdir=${env.TF_WORKDIR} init -input=false"
       }
     }
-
-    stage('TF plan') {
-
+    
+    stage('Terraform Plan') {
       steps {
-        dir('/TF_GCP/Provision_GKE/'){
-          sh 'echo --- $(pwd)  ----'
-        
-          sh 'terraform plan'
-        }
+        sh "terraform -chdir=${env.TF_WORKDIR} plan -out=tfplan -input=false -var-file='${env.TF_WORKDIR}/terraform.tfvars'"
       }
     }
-
-    stage('TF Apply') {
+    
+    stage('Terraform Apply') {
       input {
         message "Deploy to GCP and create the GKE cluster?"
       }
 
       steps {
-          dir('/TF_GCP/Provision_GKE/'){
-            sh 'echo --- $(pwd)  ----'
-        
-            sh 'terraform apply -input=false -auto-approve'
-        }
+        sh "terraform -chdir=${env.TF_WORKDIR} apply -input=false tfplan"
       }
-      post{
-
-        success{
-          echo "====++++ GKE cluster created successfully ++++===="
-        }
-        
-        failure{
-            echo "====++++ GKE cluster create failed ++++===="
-       }
-
-     }
     }
   }
 }
