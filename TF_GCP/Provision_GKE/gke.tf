@@ -13,6 +13,17 @@ variable "gke_num_nodes" {
   description = "number of gke nodes"
 }
 
+variable "nexus_user" {
+  default     = ""
+  description = "nexus3 artifactory user"
+}
+
+variable "nexus_pass" {
+  default     = ""
+  description = "nexus3 artifactory password"
+}
+
+
 # GKE cluster
 resource "google_container_cluster" "primary" {
   name     = "${var.project_id}-gke"
@@ -62,6 +73,10 @@ terraform {
     repo     = "TF-repo" 
     # an unique path to for identification
     subpath  = "GKE-TF-STATE"
+    # an username that has permissions to the repository
+    username = "${var.nexus_user}" 
+    # the password of the username you provided
+    password = "${var.nexus_pass}" 
   }
 }
 
