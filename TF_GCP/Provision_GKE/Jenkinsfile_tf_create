@@ -16,13 +16,8 @@ pipeline {
           sh 'echo --- $(pwd)  ----'
         
           sh '''
-            if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
-              cd $(pwd)/TF_GCP/Provision_GKE/
               terraform init
               terraform validate
-            else
-              exit 1
-            fi
           '''
         }
       }
@@ -34,14 +29,7 @@ pipeline {
         dir('/TF_GCP/Provision_GKE/'){
           sh 'echo --- $(pwd)  ----'
         
-          sh '''
-            if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
-              cd $(pwd)/TF_GCP/Provision_GKE/
-              terraform plan
-            else
-              exit 1
-            fi
-          '''
+          sh 'terraform plan'
         }
       }
     }
@@ -55,16 +43,7 @@ pipeline {
           dir('/TF_GCP/Provision_GKE/'){
             sh 'echo --- $(pwd)  ----'
         
-            sh '''
-              if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
-                cd $(pwd)/TF_GCP/Provision_GKE/
-                terraform apply -input=false -auto-approve
-              else
-                echo "*************** SKIPPING APPLY ******************"
-                echo "Dployment of TF GKE was not approved!"
-                echo "*************************************************"
-              fi
-            '''
+            sh 'terraform apply -input=false -auto-approve'
         }
       }
       post{
