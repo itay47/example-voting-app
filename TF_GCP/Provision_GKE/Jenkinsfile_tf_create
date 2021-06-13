@@ -16,6 +16,7 @@ pipeline {
 
     stage('itay test') {
       steps {
+        sh ('echo ---> $WORK_DIR  <-----')
         sh '''
           #!/bin/bash
           echo "we are here: $(pwd)"
