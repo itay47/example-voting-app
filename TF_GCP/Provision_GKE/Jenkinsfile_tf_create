@@ -12,12 +12,12 @@ pipeline {
 
       steps {
           sh '''
-          if [ -d "example-voting-app/TF_GCP/Provision_GKE/" ]; then
+          if [ -d example-voting-app/TF_GCP/Provision_GKE/ ]; then
             cd example-voting-app/TF_GCP/Provision_GKE/
             terraform init
             terraform validate
           else
-            for dir in example-voting-app/TF_GCP/Provision_GKE/*/
+            for dir in example-voting-app/TF_GCP/Provision_GKE/
             do 
               cd ${dir}
               env=${dir%*/}
