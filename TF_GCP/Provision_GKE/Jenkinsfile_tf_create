@@ -1,10 +1,6 @@
 pipeline {
   agent any
   
-  environment {
-    WORK_DIR = 'nothing'
-  }
-  
   stages {
 
     stage ('Git Checkout') {
@@ -15,12 +11,8 @@ pipeline {
 
     stage('itay test') {
       steps {
-        sh ('${workspace}')
-        dir('/TF_GCP/Provision_GKE/'){
-          sh 'echo --- $(pwd)  ----'
-        }
+       
         
-        sh ('echo ---> $WORK_DIR  <-----')
         sh '''
           #!/bin/bash
           echo "we are here: $(pwd)"
@@ -33,34 +25,38 @@ pipeline {
     stage('TF init & validate') {
 
       steps {
-          
+        dir('/TF_GCP/Provision_GKE/'){
+          sh 'echo --- $(pwd)  ----'
+        
           sh '''
-          echo "*** $WORK_DIR ***"
-          if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
-            cd $(pwd)/TF_GCP/Provision_GKE/
-            terraform init
-            terraform validate
-          else
-            exit 1
-            cd ../../
-          fi'''
+            if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
+              cd $(pwd)/TF_GCP/Provision_GKE/
+              terraform init
+              terraform validate
+            else
+              exit 1
+            fi
+          '''
         }
+      }
     }
 
     stage('TF plan') {
 
       steps {
-
+        dir('/TF_GCP/Provision_GKE/'){
+          sh 'echo --- $(pwd)  ----'
+        
           sh '''
-          if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
-            cd $(pwd)/TF_GCP/Provision_GKE
-            terraform plan
-          else
+            if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
+              cd $(pwd)/TF_GCP/Provision_GKE/
+              terraform plan
+            else
               exit 1
-              cd ../../
-          fi
+            fi
           '''
         }
+      }
     }
 
     stage('TF Apply') {
@@ -69,28 +65,31 @@ pipeline {
       }
 
       steps {
-        container('terraform') {
-          sh '''
-          if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
-            cd $(pwd)/TF_GCP/Provision_GKE
-            terraform apply -input=false -auto-approve
-          else
-            echo "*************** SKIPPING APPLY ******************"
-            echo "Dployment of TF GKE was not approved!"
-            echo "*************************************************"
-          fi
-          '''
+          dir('/TF_GCP/Provision_GKE/'){
+            sh 'echo --- $(pwd)  ----'
+        
+            sh '''
+              if [ -d "$(pwd)/TF_GCP/Provision_GKE/" ]; then
+                cd $(pwd)/TF_GCP/Provision_GKE/
+                terraform apply -input=false -auto-approve
+              else
+                echo "*************** SKIPPING APPLY ******************"
+                echo "Dployment of TF GKE was not approved!"
+                echo "*************************************************"
+              fi
+            '''
         }
       }
       post{
 
         success{
           echo "====++++ GKE cluster created successfully ++++===="
-
         }
-       failure{
-           echo "====++++ GKE cluster create failed ++++===="
+        
+        failure{
+            echo "====++++ GKE cluster create failed ++++===="
        }
+
      }
     }
   }
