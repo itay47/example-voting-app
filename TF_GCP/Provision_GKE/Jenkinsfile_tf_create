@@ -10,7 +10,6 @@ pipeline {
     stage ('Git Checkout') {
       steps {
               git "https://github.com/itay47/example-voting-app.git"
-              //WORK_DIR = $(pwd)
             }
       }
 
@@ -19,8 +18,9 @@ pipeline {
         sh '''
           #!/bin/bash
           echo "we are here: $(pwd)"
-          cd 
+          cd /TF_GCP/Provision_GKE/
           ls
+          $WORK_DIR = $(pwd)
         '''
        }
     }
