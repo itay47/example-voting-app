@@ -18,9 +18,6 @@ pipeline {
     stage('TF init & validate') {
 
       steps {
-          echo "******* At environment: ${env} ********"
-          echo "******* At environment: ${dir%*/} ********"
-          echo "******* At environment: ${env#*/} ********"
           
           sh 'cd example-voting-app/TF_GCP/Provision_GKE/'
           sh 'ls'
