@@ -5,21 +5,8 @@ pipeline {
 
     stage ('Git Checkout') {
       steps {
-              git "https://github.com/itay47/example-voting-app.git"
-            }
+        git "https://github.com/itay47/example-voting-app.git"
       }
-
-    stage('itay test') {
-      steps {
-       
-        
-        sh '''
-          #!/bin/bash
-          echo "we are here: $(pwd)"
-          cd /TF_GCP/Provision_GKE/
-          ls
-        '''
-       }
     }
     
     stage('TF init & validate') {
