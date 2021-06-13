@@ -8,8 +8,8 @@ pipeline {
             }
       }
 
-    stage("itay-test") {
-        sh script:'''
+    stage('itay test') {
+        sh '''
           #!/bin/bash
           echo "we are here: $(pwd)"
         '''
