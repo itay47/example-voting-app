@@ -8,6 +8,13 @@ pipeline {
             }
       }
 
+    stage("itay-test") {
+        sh script:'''
+          #!/bin/bash
+          echo "we are here: $(pwd)"
+        '''
+    }
+    
     stage('TF init & validate') {
 
       steps {
