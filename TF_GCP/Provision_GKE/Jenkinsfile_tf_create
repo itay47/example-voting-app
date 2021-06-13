@@ -14,7 +14,7 @@ pipeline {
       steps {
         dir('/TF_GCP/Provision_GKE/'){
           sh 'echo --- $(pwd)  ----'
-        
+          sh 'ls'
           sh '''
               terraform init
               terraform validate
