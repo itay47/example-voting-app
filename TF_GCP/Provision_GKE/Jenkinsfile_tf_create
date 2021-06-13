@@ -1,5 +1,10 @@
 pipeline {
   agent any
+
+  environment {
+    TF_WORKDIR = "${env.WORKSPACE}/TF_GCP/Provision_GKE" //Sets the Terraform Workspace
+    TF_IN_AUTOMATION = 'true'
+  }
   
   stages {
 
