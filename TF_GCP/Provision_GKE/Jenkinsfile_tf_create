@@ -15,6 +15,7 @@ pipeline {
 
     stage('itay test') {
       steps {
+        sh ('${workspace}')
         dir('/TF_GCP/Provision_GKE/')
         sh 'echo --- $(pwd)  ----'
         sh ('echo ---> $WORK_DIR  <-----')
