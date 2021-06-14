@@ -6,8 +6,8 @@ pipeline {
     CLOUDSDK_CONFIG = "${env.WORKSPACE}"
     GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
     NEXUS_CREDS = credentials('nexus-creds')
-    ARTIFACTORY_USERNAME = $NEXUS_CREDS_USR
-    ARTIFACTORY_PASSWORD = NEXUS_CREDS_PSW
+    ARTIFACTORY_USERNAME = "$env.NEXUS_CREDS_USR"
+    ARTIFACTORY_PASSWORD = "$env.NEXUS_CREDS_PSW"
   }
   
   stages {
