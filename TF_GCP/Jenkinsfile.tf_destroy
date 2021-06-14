@@ -12,13 +12,6 @@ pipeline {
   
   stages {
 
-    stage ('Set ENV'){
-      steps{
-        sh "echo $env.ARTIFACTORY_USERNAME"
-        sh "echo $env.ARTIFACTORY_PASSWORD"
-      }
-    }
-
     stage ('Git Checkout') {
       steps {
         git "https://github.com/itay47/example-voting-app.git"
@@ -54,7 +47,7 @@ pipeline {
           dir('TF_GCP/Provision_GKE') {
             withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
               sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-              sh ("terraform destroy -input=false tfplan")
+              sh ("terraform destroy -input=false -auto-approve")
             }
           }
       }
