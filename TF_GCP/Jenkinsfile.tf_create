@@ -6,6 +6,8 @@ pipeline {
     TF_IN_AUTOMATION = 'true'
     CLOUDSDK_CONFIG = "${env.WORKSPACE}"
     GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
+    export ARTIFACTORY_USERNAME='jenkins'
+    ARTIFACTORY_PASSWORD='jenkins'
   }
   
   stages {

@@ -13,13 +13,13 @@ variable "gke_num_nodes" {
   description = "number of gke nodes"
 }
 
-variable "nexus_user" {
-  description = "nexus3 artifactory user"
-}
+# variable "nexus_user" {
+#   description = "nexus3 artifactory user"
+# }
 
-variable "nexus_pass" {
-  description = "nexus3 artifactory password"
-}
+# variable "nexus_pass" {
+#   description = "nexus3 artifactory password"
+# }
 
 
 # GKE cluster
@@ -65,8 +65,8 @@ resource "google_container_node_pool" "primary_nodes" {
 
 terraform {
   backend "artifactory" {
-    ARTIFACTORY_USERNAME  = "${var.nexus_user}"
-    ARTIFACTORY_PASSWORD  = "${var.nexus_pass}"
+    # ARTIFACTORY_USERNAME  = "${var.nexus_user}"
+    # ARTIFACTORY_PASSWORD  = "${var.nexus_pass}"
     #url      = "${data.terraform_remote_state.state.url}"
     url      = "http://shechter47.mooo.com:8181/repository"
     #repo     = "${data.terraform_remote_state.state.repo}"
