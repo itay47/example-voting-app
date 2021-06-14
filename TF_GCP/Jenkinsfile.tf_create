@@ -6,8 +6,8 @@ pipeline {
     TF_IN_AUTOMATION = 'true'
     CLOUDSDK_CONFIG = "${env.WORKSPACE}"
     GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
-    ARTIFACTORY_USERNAME = credentials('nexus-creds[nexus_user]')
-    ARTIFACTORY_PASSWORD = credentials('nexus-creds[nexus_pass]')
+    ARTIFACTORY_USERNAME = 'jenkins' //credentials('nexus-creds[nexus_user]')
+    ARTIFACTORY_PASSWORD = 'jenkins' //credentials('nexus-creds[nexus_pass]')
   }
   
   stages {
