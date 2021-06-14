@@ -79,9 +79,9 @@ data "terraform_remote_state" "state" {
     # an unique path to for identification
     subpath  = "GKE-TF-STATE"
     # an username that has permissions to the repository
-    username = "${var.nexus_user}" 
+    username = "var.nexus_user" 
     # the password of the username you provided
-    password = "${var.nexus_pass}" 
+    password = "var.nexus_pass" 
   }
 }
 
