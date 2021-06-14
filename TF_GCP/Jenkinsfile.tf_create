@@ -19,8 +19,10 @@ pipeline {
     stage('Terraform Init') {
       steps {
         dir('TF_GCP/Provision_GKE') {
-          sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-          sh ("terraform init -input=false -reconfigure")
+          withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
+            sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+            sh ("terraform init -input=false -reconfigure -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass")
+          }
         }
         //sh "terraform -chdir=${env.TF_WORKDIR} init -input=false"
       }
@@ -30,7 +32,7 @@ pipeline {
       steps {
           dir('TF_GCP/Provision_GKE') {
             sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-            sh ("terraform plan -out=tfplan -input=false -var-file=./terraform.tfvars")
+            sh ("terraform plan -out=tfplan -input=false -var-file=terraform.tfvars -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass")
           }
           //sh "terraform -chdir=${env.TF_WORKDIR} plan -out=tfplan -input=false -var-file=${env.TF_WORKDIR}/terraform.tfvars"
         }
@@ -45,7 +47,7 @@ pipeline {
           dir('TF_GCP/Provision_GKE') {
             withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
               sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-              sh ("terraform apply -out=tfplan -auto-approve -input=false -var-file=./terraform.tfvars -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass")
+              sh ("terraform apply -out=tfplan -auto-approve -input=false -var-file=terraform.tfvars -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass")
             }
           }
         //withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
