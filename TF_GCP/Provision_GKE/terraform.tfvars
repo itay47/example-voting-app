@@ -10,6 +10,6 @@ repo     = "TF-repo"
 # an unique path to for identification
 subpath  = "GKE-TF-STATE"
 # an username that has permissions to the repository
-username = "" 
+username = "jenkins" 
 # the password of the username you provided
-password = "" 
+password = "jenkins" 
