@@ -17,9 +17,7 @@ pipeline {
     
     stage('Terraform Init') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
-          sh "terraform -chdir=${env.TF_WORKDIR} init -input=false -var-file=${env.TF_WORKDIR}/terraform.tfvars -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass"
-        }
+        sh "terraform -chdir=${env.TF_WORKDIR} init -input=false"
       }
     }
     
