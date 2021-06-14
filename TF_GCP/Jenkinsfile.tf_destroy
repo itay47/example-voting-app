@@ -15,8 +15,8 @@ pipeline {
       steps{
         withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
           script{
-            sh env.ARTIFACTORY_USERNAME = "$nexus_user"
-            sh env.ARTIFACTORY_PASSWORD = "$nexus_pass"
+            sh ("env.ARTIFACTORY_USERNAME = $nexus_user")
+            sh ("env.ARTIFACTORY_PASSWORD = $nexus_pass")
           }
         }
       }
