@@ -14,12 +14,10 @@ variable "gke_num_nodes" {
 }
 
 variable "nexus_user" {
-  default     = ""
   description = "nexus3 artifactory user"
 }
 
 variable "nexus_pass" {
-  default     = ""
   description = "nexus3 artifactory password"
 }
 
