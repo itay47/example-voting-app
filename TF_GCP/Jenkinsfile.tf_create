@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    TF_WORKDIR = "${env.WORKSPACE}/TF_GCP/Provision_GKE" //Sets the Terraform Workspace
+    //TF_WORKDIR = "${env.WORKSPACE}/TF_GCP/Provision_GKE" //Sets the Terraform Workspace
     TF_IN_AUTOMATION = 'true'
     CLOUDSDK_CONFIG = "${env.WORKSPACE}"
     GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
@@ -20,7 +20,7 @@ pipeline {
       steps {
         dir('TF_GCP/Provision_GKE') {
           sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-          sh 'terraform init -input=false'
+          sh ("terraform init -input=false")
         }
         //sh "terraform -chdir=${env.TF_WORKDIR} init -input=false"
       }
@@ -30,7 +30,7 @@ pipeline {
       steps {
           dir('TF_GCP/Provision_GKE') {
             sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-            sh 'terraform plan -out=tfplan -input=false -var-file=./terraform.tfvars'
+            sh ("terraform plan -out=tfplan -input=false -var-file=./terraform.tfvars")
           }
           //sh "terraform -chdir=${env.TF_WORKDIR} plan -out=tfplan -input=false -var-file=${env.TF_WORKDIR}/terraform.tfvars"
         }
@@ -44,7 +44,7 @@ pipeline {
       steps {
           dir('TF_GCP/Provision_GKE') {
             sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-            sh 'terraform apply -out=tfplan -auto-approve -input=false -var-file=./terraform.tfvars'
+            sh ("terraform apply -out=tfplan -auto-approve -input=false -var-file=./terraform.tfvars")
           }
         //withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
           //sh "terraform -chdir=${env.TF_WORKDIR} apply -input=false tfplan -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass"
