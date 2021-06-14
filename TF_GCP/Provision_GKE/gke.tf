@@ -65,29 +65,32 @@ resource "google_container_node_pool" "primary_nodes" {
 
 terraform {
   backend "artifactory" {
-    username = "${data.terraform_remote_state.state.nexus_user}"
-    password = "${data.terraform_remote_state.state.nexus_pass}"
-    url      = "${data.terraform_remote_state.state.url}"
-    repo     = "${data.terraform_remote_state.state.repo}"
-    subpath  = "${data.terraform_remote_state.state.subpath}"
+    username = "jenkins"
+    password = "jenkins"
+    #url      = "${data.terraform_remote_state.state.url}"
+    url      = "http://shechter47.mooo.com:8181/repository"
+    #repo     = "${data.terraform_remote_state.state.repo}"
+    repo     = "TF-repo" 
+    #subpath  = "${data.terraform_remote_state.state.subpath}"
+    subpath  = "GKE-TF-STATE"
   }
 }
 
-data "terraform_remote_state" "state" {
- backend = "artifactory"
- config {
-   # URL of the nexus repository
-   url      = "http://shechter47.mooo.com:8181/repository" 
-   # the repository name you just created
-   repo     = "TF-repo" 
-   # an unique path to for identification
-   subpath  = "GKE-TF-STATE"
-   # an username that has permissions to the repository
-   username = "${var.nexus_user}" 
-   # the password of the username you provided
-   password = "${var.nexus_pass}" 
- }
-}
+# data "terraform_remote_state" "state" {
+#  backend = "artifactory"
+#  config {
+#    # URL of the nexus repository
+#    url      = "http://shechter47.mooo.com:8181/repository" 
+#    # the repository name you just created
+#    repo     = "TF-repo" 
+#    # an unique path to for identification
+#    subpath  = "GKE-TF-STATE"
+#    # an username that has permissions to the repository
+#    username = "${var.nexus_user}" 
+#    # the password of the username you provided
+#    password = "${var.nexus_pass}" 
+#  }
+# }
 
 # # Kubernetes provider
 # # The Terraform Kubernetes Provider configuration below is used as a learning reference only. 
