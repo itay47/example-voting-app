@@ -20,7 +20,7 @@ pipeline {
       steps {
         dir('TF_GCP/Provision_GKE') {
           sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-          sh ("terraform init -input=false")
+          sh ("terraform init -input=false -reconfigure")
         }
         //sh "terraform -chdir=${env.TF_WORKDIR} init -input=false"
       }
