@@ -2,11 +2,23 @@ pipeline {
   agent any
 
   environment {
-    TF_WORKDIR = "${env.WORKSPACE}/TF_GCP/Provision_GKE" //Sets the Terraform Workspace
     TF_IN_AUTOMATION = 'true'
+    CLOUDSDK_CONFIG = "${env.WORKSPACE}"
+    GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
+    ARTIFACTORY_USERNAME = '' //credentials('nexus-creds[nexus_user]')
+    ARTIFACTORY_PASSWORD = '' //credentials('nexus-creds[nexus_pass]')
   }
   
   stages {
+
+    stage ('Set ENV'){
+      steps{
+        withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
+          ARTIFACTORY_USERNAME = "${nexus_user}"
+          ARTIFACTORY_PASSWORD = "${nexus_pass}"
+        }
+      }
+    }
 
     stage ('Git Checkout') {
       steps {
@@ -16,23 +28,36 @@ pipeline {
     
     stage('Terraform Init') {
       steps {
-        sh "terraform -chdir=${env.TF_WORKDIR} init -input=false"
+        dir('TF_GCP/Provision_GKE') {
+          withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
+            sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+            sh ("terraform init -input=false -reconfigure")
+          }
+        }
       }
     }
     
     stage('Terraform Plan') {
       steps {
-        sh "terraform -chdir=${env.TF_WORKDIR} plan -out=tfplan -input=false -var-file='${env.TF_WORKDIR}/terraform.tfvars'"
+          dir('TF_GCP/Provision_GKE') {
+            sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+            sh ("terraform plan -out=tfplan -input=false -var-file=terraform.tfvars")
+          }
+        }
       }
-    }
     
-    stage('Terraform Destroy') {
+    stage('Terraform Apply') {
       input {
-        message "Terminate the GKE cluster?"
+        message "Deploy to GCP and create the GKE cluster?"
       }
 
       steps {
-        sh "terraform -chdir=${env.TF_WORKDIR} destroy -input=false tfplan"
+          dir('TF_GCP/Provision_GKE') {
+            withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
+              sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+              sh ("terraform destroy -input=false tfplan")
+            }
+          }
       }
     }
   }
