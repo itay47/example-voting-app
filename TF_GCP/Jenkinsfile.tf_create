@@ -26,7 +26,6 @@ pipeline {
           sh "terraform -chdir=${env.TF_WORKDIR} plan -out=tfplan -input=false -var-file=${env.TF_WORKDIR}/terraform.tfvars"
         }
       }
-    }
     
     stage('Terraform Apply') {
       input {
@@ -38,6 +37,7 @@ pipeline {
           sh "terraform -chdir=${env.TF_WORKDIR} apply -input=false tfplan -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass"
         }
       }
+
     }
   }
 }
