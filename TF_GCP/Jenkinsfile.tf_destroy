@@ -40,7 +40,7 @@ pipeline {
     
     stage('Terraform Apply') {
       input {
-        message "Deploy to GCP and create the GKE cluster?"
+        message "Destroy the GKE cluster?"
       }
 
       steps {
