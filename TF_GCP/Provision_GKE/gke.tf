@@ -64,7 +64,13 @@ resource "google_container_node_pool" "primary_nodes" {
 }
 
 terraform {
-  backend "artifactory" {}
+  backend "artifactory" {
+    username = terraform_remote_state.state.username
+    password = terraform_remote_state.state.password
+    url      = terraform_remote_state.state.url
+    repo     = terraform_remote_state.state.repo
+    subpath  = terraform_remote_state.state.subpath
+  }
 }
 
 data "terraform_remote_state" "state" {
