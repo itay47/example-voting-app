@@ -48,9 +48,7 @@ pipeline {
           }
         //withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
           //sh "terraform -chdir=${env.TF_WORKDIR} apply -input=false tfplan -var=nexus_user=$nexus_user -var=nexus_pass=$nexus_pass"
-        }
       }
-
     }
   }
 }
