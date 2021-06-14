@@ -13,13 +13,13 @@ variable "gke_num_nodes" {
   description = "number of gke nodes"
 }
 
-variable "nexus_user" {
-  description = "nexus3 artifactory user"
-}
+# variable "nexus_user" {
+#   description = "nexus3 artifactory user"
+# }
 
-variable "nexus_pass" {
-  description = "nexus3 artifactory password"
-}
+# variable "nexus_pass" {
+#   description = "nexus3 artifactory password"
+# }
 
 
 # GKE cluster
