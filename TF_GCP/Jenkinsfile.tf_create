@@ -101,6 +101,13 @@ pipeline {
                     echo "Proj ID: ${jsonobj.project_id.value}"
                     echo "region: ${jsonobj.region.value}"
                     echo "vpc: ${jsonobj.vpc.value}"
+
+                    Telegram.sendTextTelegram("GKE cluster name: ${jsonobj.kubernetes_cluster_name.value}")
+                    Telegram.sendTextTelegram("GKE cluster IP: ${jsonobj.kubernetes_cluster_host.value}")
+                    Telegram.sendTextTelegram("Proj ID: ${jsonobj.project_id.value}")
+                    Telegram.sendTextTelegram("region: ${jsonobj.region.value}")
+                    Telegram.sendTextTelegram("vpc: ${jsonobj.vpc.value}")
+                    
               }
             }
           }
