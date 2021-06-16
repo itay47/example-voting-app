@@ -39,6 +39,7 @@ pipeline {
             sh ("terraform plan -out=tfplan -input=false -var-file=terraform.tfvars")
           }
         }
+        
       post{
           success{
               script{
@@ -79,7 +80,7 @@ pipeline {
               script{
                 Telegram.sendTextTelegram("Provision of GKE cluster failed")
               }
-          }
+      }
     }
   }
 }
