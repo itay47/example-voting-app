@@ -42,12 +42,12 @@ pipeline {
       post{
           success{
               script{
-                Telegram.sendTextTelegram("Terraform Plan completed\nConfim Apply")
+                Telegram.sendTextTelegram("Terraform [DESTROY] Plan completed\nConfim Apply")
               }
           }
           failure{
               script{
-                Telegram.sendTextTelegram("Terraform Plan failed")
+                Telegram.sendTextTelegram("Terraform [DESTROY] Plan failed")
               }
           }
       }
@@ -71,13 +71,13 @@ pipeline {
           success{
               echo "====++++ Destroy success ++++===="
               script{
-                Telegram.sendTextTelegram("Destry of GKE cluster success")
+                Telegram.sendTextTelegram("Destroy of GKE cluster success")
               }
           }
           failure{
               echo "====++++ Destroy failed ++++===="
               script{
-                Telegram.sendTextTelegram("Destry of GKE cluster failed")
+                Telegram.sendTextTelegram("Destroy of GKE cluster failed")
               }
           }
       }
