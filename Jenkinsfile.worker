@@ -1,4 +1,4 @@
-library identifier: 'example-voting-app/jenkins-shared@master', retriever: modernSCM(
+library identifier: 'example-voting-app@master', retriever: modernSCM(
         [$class: 'GitSCMSource', remote: 'https://github.com/itay47/example-voting-app.git'])
 
 pipeline {
