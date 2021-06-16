@@ -37,7 +37,9 @@ pipeline {
             post{
                 success{
                     echo "====++++ build success ++++===="
-                    Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Success!")
+                    script{
+                        Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Success!")
+                    }
 
                     script{
                         sh 'docker images'
@@ -45,7 +47,9 @@ pipeline {
                 }
                 failure{
                     echo "====++++ build execution failed ++++===="
-                    Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Fail!")
+                    script{
+                        Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Fail!")
+                    }
                 }
             }
     } 
@@ -67,11 +71,15 @@ pipeline {
       post{
           success{
               echo "====++++ upload success ++++===="
-              Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- dockerhub upload Success!")
+              script {
+                  Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- dockerhub upload Success!") 
+              }
           }
           failure{
               echo "====++++ upload failed ++++===="
-              Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- dockerhub upload Fail!")
+              script{
+                Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- dockerhub upload Fail!")
+              }
           }
       }
     }
@@ -114,15 +122,18 @@ pipeline {
                         
                         //remove local images to cleanup storage 
                         sh "docker rmi itay47/voting-app:result_$BUILD_TAG shechter47.mooo.com:9047/voting-app:result_$BUILD_TAG"
+                    
+                        Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- nexus3 upload Success!")
                     }
-                    Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- nexus3 upload Success!")
                 }
                 failure{
                     echo "====++++ Upload to registry failed ++++===="
                     
                     //remove local images to cleanup storage 
                     sh "docker rmi itay47/voting-app:result_$BUILD_TAG shechter47.mooo.com:9047/voting-app:result_$BUILD_TAG"
-                    Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- nexus3 upload Fail!")
+                    script{
+                        Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- nexus3 upload Fail!")
+                    }
                 }
             }
         }
