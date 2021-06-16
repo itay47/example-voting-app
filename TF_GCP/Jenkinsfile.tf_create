@@ -84,5 +84,44 @@ pipeline {
           }
       }
     }
+
+    stage('Get TF output') {
+
+      steps {
+          dir('TF_GCP/Provision_GKE') {
+            withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
+              sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+              script{
+                    def tfoutput = sh(script:"terraform output -json",returnStdout: true).trim()
+                    //echo "${tfoutput}"
+                    def jsonobj = readJSON text: "${aaa}"
+                    
+                    echo "GKE cluster name: ${jsonobj.kubernetes_cluster_name.value}"
+                    echo "GKE cluster IP: ${jsonobj.kubernetes_cluster_host.value}"
+                    echo "Proj ID: ${jsonobj.project_id.value}"
+                    echo "region: ${jsonobj.region.value}"
+                    echo "vpc: ${jsonobj.vpc.value}"
+              }
+            }
+          }
+      }
+      
+      post{         
+          success{
+              echo "====++++ Provision success ++++===="
+              script{
+                Telegram.sendTextTelegram("Provision of GKE cluster success")
+              }
+          }
+          
+          failure{
+              echo "====++++ Provision failed ++++===="
+              script{
+                Telegram.sendTextTelegram("Provision of GKE cluster failed")
+              }
+          }
+      }
+    }
+
   }
 }
