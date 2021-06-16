@@ -94,7 +94,7 @@ pipeline {
               script{
                     def tfoutput = sh(script:"terraform output -json",returnStdout: true).trim()
                     //echo "${tfoutput}"
-                    def jsonobj = readJSON text: "${aaa}"
+                    def jsonobj = readJSON text: "${tfoutput}"
                     
                     echo "GKE cluster name: ${jsonobj.kubernetes_cluster_name.value}"
                     echo "GKE cluster IP: ${jsonobj.kubernetes_cluster_host.value}"
@@ -107,28 +107,27 @@ pipeline {
                     Telegram.sendTextTelegram("Proj ID: ${jsonobj.project_id.value}")
                     Telegram.sendTextTelegram("region: ${jsonobj.region.value}")
                     Telegram.sendTextTelegram("vpc: ${jsonobj.vpc.value}")
-                    
+
+                    //notify once the cluster is up
+                    while( true ) {
+                      //get cluster status in json format
+                      def gke_status = sh(script:"gcloud container clusters list --project ${jsonobj.project_id.value} --format json",returnStdout: true).trim()
+                      gke_status = (gke_status.substring(1, gke_status.length() - 1)).trim()
+                      writeFile(file: 'gke_status.json', text: gke_status)
+                      def __obj = readJSON text: "${gke_status}"
+                      //echo "${__obj.status}"
+
+                      if( __obj.status == "RUNNING" ) {break}
+                      else {
+                        echo "still running..."
+                        Telegram.sendTextTelegram("GKE cluster status: ${jsonobj.vpc.value}")
+                        sleep(time:2,unit:"MINUTES")
+                      }
+                    }
               }
             }
           }
       }
-      
-      post{         
-          success{
-              echo "====++++ Provision success ++++===="
-              script{
-                Telegram.sendTextTelegram("Provision of GKE cluster success")
-              }
-          }
-          
-          failure{
-              echo "====++++ Provision failed ++++===="
-              script{
-                Telegram.sendTextTelegram("Provision of GKE cluster failed")
-              }
-          }
-      }
     }
-
   }
 }
