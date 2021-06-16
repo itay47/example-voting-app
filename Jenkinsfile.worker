@@ -114,8 +114,9 @@ pipeline {
                         
                         //remove local images to cleanup storage 
                         sh "docker rmi itay47/voting-app:worker_$BUILD_TAG shechter47.mooo.com:9047/voting-app:worker_$BUILD_TAG"
-                        Telegram.sendTextTelegram("voting-app:worker_$BUILD_TAG -- nexus3 upload Success!")
                     }
+                    Telegram.sendTextTelegram("voting-app:worker_$BUILD_TAG -- nexus3 upload Success!")
+                    
                 }
                 failure{
                     echo "====++++ Upload to registry failed ++++===="
