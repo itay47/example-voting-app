@@ -117,7 +117,10 @@ pipeline {
                       def __obj = readJSON text: "${gke_status}"
                       //echo "${__obj.status}"
 
-                      if( __obj.status == "RUNNING" ) {break}
+                      if( __obj.status == "RUNNING" ) {
+                        Telegram.sendTextTelegram("GKE cluster status: ${jsonobj.vpc.value}")
+                        break
+                      }
                       else {
                         echo "still running..."
                         Telegram.sendTextTelegram("GKE cluster status: ${jsonobj.vpc.value}")
