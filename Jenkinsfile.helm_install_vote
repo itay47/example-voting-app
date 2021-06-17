@@ -1,8 +1,7 @@
+library identifier: 'example-voting-app@master', retriever: modernSCM(
+        [$class: 'GitSCMSource', remote: 'https://github.com/itay47/example-voting-app.git'])
 
-
-/*
-    Create the kubernetes namespace
- */
+//Create the kubernetes namespace
 def createNamespace (namespace) {
     echo "Creating namespace ${namespace} if needed"
 
@@ -17,7 +16,7 @@ pipeline {
               string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
               string(name: 'HELM_DIR_NAME', defaultValue: 'my-vote', description: 'The Helm directory name')
               string(name: 'VALUES_FILE', defaultValue: 'dev-values.yaml', description: 'The Helm values file name')
-              string(name: 'GKE_CLUSTER', defaultValue: 'final-project-gke', description: 'The GCP cluster name')
+              string(name: 'GKE_CLUSTER', defaultValue: 'devops-310517-gke', description: 'The GCP cluster name')
               string(name: 'GCP_PROJECT', defaultValue: 'devops-310517', description: 'The GCP project name')
               string(name: 'GCP_REGION', defaultValue: 'us-east1', description: 'The GCP region name')
               string(name: 'GCP_CLUSTER_VPC', defaultValue: 'final-project', description: 'The GCP VPC name')
@@ -32,7 +31,15 @@ pipeline {
             }
           }
 
-        stage('Helm install vote') {
+        stage('Helm package voting-app') {
+            steps {
+                script {
+                    sh "helm install ${params.HELM_CHART} -f ${params.VALUES_FILE} ${params.HELM_DIR_NAME}"
+                }
+            }
+        }  
+
+        stage('Helm install voting-app') {
             steps {
                 script {
                     sh "helm install ${params.HELM_CHART} -f ${params.VALUES_FILE} ${params.HELM_DIR_NAME}"
