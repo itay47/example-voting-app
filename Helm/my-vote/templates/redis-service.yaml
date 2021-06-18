@@ -4,13 +4,13 @@ metadata:
   labels:
     app: redis
   name: redis
-  namespace: vote
+  namespace: {{ .Values.GLOBAL.namespace }}
 spec:
   type: ClusterIP
   ports:
   - name: "redis-service"
-    port: 6379
-    targetPort: 6379
+    port: {{ .Values.image_redis.port }}
+    targetPort: {{ .Values.image_redis.targetPort }}
   selector:
     app: redis
   

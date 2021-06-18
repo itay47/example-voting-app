@@ -26,8 +26,11 @@ image_worker:
   tag: "worker_v0.1.222"
 
 image_redis:
+  replicas: 1
   repository: redis:alpine
   pullPolicy: "IfNotPresent"
+  port: 6379
+  targetPort: 6379
 
 image_db:
   repository: postgres

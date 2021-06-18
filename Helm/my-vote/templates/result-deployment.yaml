@@ -4,9 +4,9 @@ metadata:
   labels:
     app: result
   name: result
-  namespace: vote
+  namespace: {{ .values.GLOBAL.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.image_result.replicas }}
   selector:
     matchLabels:
       app: result
@@ -16,8 +16,8 @@ spec:
         app: result
     spec:
       containers:
-      - image: dockersamples/examplevotingapp_result:before
+      - image: {{ .Values.image_result.repository }}':'{{ .Values.image_result.tag }}  #dockersamples/examplevotingapp_result:before
         name: result
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.image_result.targetPort}}
           name: result
