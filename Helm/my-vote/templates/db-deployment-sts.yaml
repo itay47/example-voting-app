@@ -7,7 +7,7 @@ metadata:
   labels:
     app: db
   name: db
-  namespace: "{{ .values.GLOBAL.namespace}}"
+  namespace: {{ .Values.GLOBAL.namespace}}
 spec:
   replicas: 1
   serviceName: db
@@ -20,13 +20,13 @@ spec:
         app: db
     spec:
       containers:
-      - image: "{{ .values.image_db.repository}}:{{ .values.image_db.tag}}"
-        name: "{{ .values.image_db.repository}}" #postgres
+      - image: {{ .Values.image_db.repository}}':'{{ .Values.image_db.tag}}
+        name: {{ .Values.image_db.repository}} #postgres
         env:
         - name: POSTGRES_USER
-          value: "{{ .values.image_db.env_user}}"
+          value: {{ .Values.image_db.env_user}}
         - name: POSTGRES_PASSWORD
-          value: "{{ .values.image_db.env_pass}}"
+          value: {{ .Values.image_db.env_pass}}
         ports:
         - containerPort: 5432
           name: postgres
@@ -47,7 +47,7 @@ kind: StorageClass
 apiVersion: v1 #storage.k8s.io/v1
 metadata:
   name: pgsql-pv-strgclass
-  namespace: "{{ .values.GLOBAL.namespace}}"
+  namespace: {{ .Values.GLOBAL.namespace}}
 provisioner: hostpath #microk8s.io/hostpath # needs "microk8s enable storage"
 volumeBindingMode: Immediate
 
@@ -59,7 +59,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pgsql-pv-volume
-  namespace: "{{ .values.GLOBAL.namespace}}"
+  namespace: {{ .Values.GLOBAL.namespace}}
   labels:
     type: local
 spec:
@@ -70,7 +70,7 @@ spec:
     - ReadWriteOnce
   hostPath:
     #pre-created folder on the following path + took ownership
-    path: "{{ .values.image_db.storage_path}}" #"/mnt/k8s-pv-data"
+    path: {{ .Values.image_db.storage_path}} #"/mnt/k8s-pv-data"
 
 ##########################################
 # create a Persistant Volume Claim (PVC) #
@@ -80,7 +80,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pgsql-pv-claim
-  namespace: "{{ .values.GLOBAL.namespace}}"
+  namespace: {{ .Values.GLOBAL.namespace}}
 spec:
   storageClassName: pgsql-pv-strgclass
   accessModes:
