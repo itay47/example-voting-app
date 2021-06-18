@@ -9,12 +9,22 @@ def createNamespace (namespace) {
 }
 
 
+
+
 pipeline {
     agent any
+
+    environment {
+        CLOUDSDK_CONFIG = "${env.WORKSPACE}"
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
+        NEXUS_CREDS = credentials('nexus-creds')
+        ARTIFACTORY_USERNAME = "$env.NEXUS_CREDS_USR"
+        ARTIFACTORY_PASSWORD = "$env.NEXUS_CREDS_PSW"
+    }
   
     parameters {
               string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
-              string(name: 'HELM_DIR_NAME', defaultValue: 'my-vote', description: 'The Helm directory name')
+              string(name: 'HELM_DIR_NAME', defaultValue: 'Helm/my-vote', description: 'The Helm directory name')
               string(name: 'VALUES_FILE', defaultValue: 'dev-values.yaml', description: 'The Helm values file name')
               string(name: 'GKE_CLUSTER', defaultValue: 'devops-310517-gke', description: 'The GCP cluster name')
               string(name: 'GCP_PROJECT', defaultValue: 'devops-310517', description: 'The GCP project name')
@@ -31,18 +41,72 @@ pipeline {
             }
           }
 
-        stage('Helm package voting-app') {
+        stage('Helm package and upload to nexus3 repo') {
             steps {
-                script {
-                    sh "helm install ${params.HELM_CHART} -f ${params.VALUES_FILE} ${params.HELM_DIR_NAME}"
+                withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'NEXUS_CRED_PSW', usernameVariable: 'NEXUS_CRED_USR')]) {
+                    script{
+                        def HELM_PACK = ''
+                        try{
+                            //package the chart
+                            sh ("helm package ${params.HELM_DIR_NAME}/${params.HELM_CHART}")
+                            //grab the package name
+                            HELM_PACK = sh(script:"ls my-vote*",returnStdout: true).trim()
+                            //move it to the correct folder - ** package name must be same as in chart **
+                            sh ("mv ${HELM_PACK} Helm/")
+                            //connect and push to nexus3 helm-repo:
+                            sh ("curl -u $NEXUS_CRED_USR:$NEXUS_CRED_PSW http://shechter47.mooo.com:8181/repository/helm-nexus/ --upload-file Helm/${HELM_PACK} -v")
+
+                            Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Success!")
+
+                            //remove local package for cleanup
+                            sh ("rm Helm/${HELM_PACK}")
+                        }
+                        catch (err) {
+                            echo err.getMessage()
+                            Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Fail!")
+                            Telegram.sendTextTelegram("err: ${err.getMessage()}")
+                        }
+                    }
                 }
             }
         }  
 
-        stage('Helm install voting-app') {
+        stage('Helm install voting-app from nexus3 repo') {
+
+            input {
+                message "Deploy to GKE?"
+            }
+
             steps {
-                script {
-                    sh "helm install ${params.HELM_CHART} -f ${params.VALUES_FILE} ${params.HELM_DIR_NAME}"
+                withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
+                    sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+                    script{
+                        def HELM_PACK = ''
+                        try{
+                            //add and connect to a helm repo from artifactory:
+                            //helm repo add <REPO_KEY> http://<ARTIFACTORY_HOST>:<ARTIFACTORY_PORT>/artifactory/<REPO_KEY> --username <USERNAME> --password <PASSWORD>
+                            //helm repo update  <--- updates helm to use the newly added repo (acts like apt-get update)
+                            sh ("helm repo add helm-nexus http://shechter47.mooo.com:8181/repository/helm-nexus/ --username $NEXUS_CRED_USR --password $NEXUS_CRED_PSW")
+                            sh ("helm repo update")
+                            HELM_PACK= sh(script:"helm search repo -l --output json",returnStdout: true).trim()
+                            HELM_PACK = (HELM_PACK.substring(1, HELM_PACK.length() - 1)).trim() //remove leading and trailing '[' & ']'
+                            def jsn = readJSON text: "${HELM_PACK}"
+                            //"name":"helm-nexus/my-vote","version":"0.18.6.0","app_version":"1.18.6.0..."
+                            def package_name = "${jsn.name}"
+                            def package_version = "${jsn.version}"
+
+                            //test it before deploy
+                            sh ("helm install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version} --dry-run")
+                            
+                            //deploy to GKE
+                            sh ("helm install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version}")
+                        }
+                        catch (err) {
+                            echo err.getMessage()
+                            Telegram.sendTextTelegram("Failed to install Helm package: ${HELM_PACK}")
+                            Telegram.sendTextTelegram("err: ${err.getMessage()}")
+                        }
+                    }
                 }
             }
         }
