@@ -87,7 +87,6 @@ pipeline {
                         }
                         catch (err) {
                             Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${$params.App_Version} -- Fail!")
-                            throw
                         }
                     }
                 }
