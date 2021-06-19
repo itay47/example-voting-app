@@ -169,6 +169,5 @@ pipeline {
                 sh "gcloud compute firewall-rules create node-port-${params.RESULT_PORT} --network ${params.GCP_CLUSTER_VPC} --allow tcp:${params.RESULT_PORT}"
             }
         }
-        
     }
 }
