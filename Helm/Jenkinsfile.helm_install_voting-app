@@ -79,16 +79,16 @@ pipeline {
 
         stage('push to repository') {
             steps{         
-                sh "git commit -a -m update_build_number:${$params.App_Version}"         
+                sh "git commit -a -m update_build_number:${params.App_Version}"         
                 withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     //sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/etzi71/voting-app.git HEAD:master")
                     script{
                         try {
                             sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@$env.GIT_URL HEAD:master")
-                            Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${$params.App_Version} -- Success!")
+                            Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${params.App_Version} -- Success!")
                         }
                         catch (err) {
-                            Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${$params.App_Version} -- Fail!")
+                            Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${params.App_Version} -- Fail!")
                         }
                     }
                 }
