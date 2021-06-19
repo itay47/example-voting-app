@@ -60,20 +60,6 @@ pipeline {
                 sh "gcloud compute firewall-rules delete node-port-${params.RESULT_PORT}"
             }
         }
-
-        // stage('helm delete kubeview') {
-        //     steps {
-        //         sh "helm delete my-kubeview"
-        //         sh "kubectl delete namespace kubeview"
-        //     }
-        // }
-
-        // stage('helm delete prometheus-grafana') {
-        //     steps {
-        //         sh "helm delete my-kube-prometheus-stack"
-        //         sh "kubectl delete namespace prom"
-        //     }
-        // }
-
+        
     }
 }
