@@ -78,7 +78,7 @@ pipeline {
         stage('push to repository') {
             steps{         
                 sh "git commit -a -m update_build_number:${$params.App_Version}"         
-                withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/etzi71/voting-app.git HEAD:master'){
+                withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     //sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/etzi71/voting-app.git HEAD:master")
                     script{
                         try {
