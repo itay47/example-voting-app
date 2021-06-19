@@ -88,6 +88,7 @@ pipeline {
                         }
                         catch (err) {
                             Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${params.App_Version} -- Fail!")
+                            error(err.getMessage())
                         }
                     }
                 }
@@ -119,6 +120,7 @@ pipeline {
                             echo err.getMessage()
                             Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Fail!")
                             Telegram.sendTextTelegram("err: ${err.getMessage()}")
+                            error(err.getMessage())
                         }
                     }
                 }
