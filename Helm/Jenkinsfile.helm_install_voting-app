@@ -80,7 +80,15 @@ pipeline {
                 sh "git commit -a -m update_build_number:${$params.App_Version}"         
                 withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/etzi71/voting-app.git HEAD:master'){
                     //sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/etzi71/voting-app.git HEAD:master")
-                    sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@$env.GIT_URL HEAD:master")
+                    script{
+                        try{
+                            sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@$env.GIT_URL HEAD:master")
+                            Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${$params.App_Version} -- Success!")
+                        }
+                        catch {
+                            Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${$params.App_Version} -- Fail!")
+                        }
+                    }
                 }
             }
         }
@@ -162,37 +170,38 @@ pipeline {
             }
         }
 
-        stage('helm install kubeview') {
-            steps {
-                script {
-                    sh "helm repo add kubeview https://benc-uk.github.io/kubeview/charts ; helm repo update"
-                    namespace = 'kubeview'
-                    createNamespace (namespace)
-                    sh "helm install my-kubeview kubeview/kubeview --namespace ${namespace} --version 0.1.20"
-                }
-            }
-        }
+        // stage('helm install kubeview') {
+        //     steps {
+        //         script {
+        //             sh "helm repo add kubeview https://benc-uk.github.io/kubeview/charts ; helm repo update"
+        //             namespace = 'kubeview'
+        //             createNamespace (namespace)
+        //             sh "helm install my-kubeview kubeview/kubeview --namespace ${namespace} --version 0.1.20"
+        //         }
+        //     }
+        // }
 
-        stage('helm install prometheus-grafana') {
-            steps {
-                script {
-                    sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts ; helm repo update"
-                    namespace = 'prom'
-                    createNamespace (namespace)
-                    sh "helm install my-kube-prometheus-stack prometheus-community/kube-prometheus-stack --namespace ${namespace} --version 16.7.0"
-                }
-            }
-        }
+    //     stage('helm install prometheus-grafana') {
+    //         steps {
+    //             script {
+    //                 sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts ; helm repo update"
+    //                 namespace = 'prom'
+    //                 createNamespace (namespace)
+    //                 sh "helm install my-kube-prometheus-stack prometheus-community/kube-prometheus-stack --namespace ${namespace} --version 16.7.0"
+    //             }
+    //         }
+    //     }
 
-        stage('kubectl get nodes') {
-            steps {
-                script {
-                    sh "kubectl get nodes -o wide"
-                    sh "kubectl get --namespace default svc my-kubeview"
-                    sh "kubectl get svc --namespace kubeview my-kubeview -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
-                    sh "kubectl --namespace prom get pods -l release=my-kube-prometheus-stack"
-                }
-            }
-       }
+    //     stage('kubectl get nodes') {
+    //         steps {
+    //             script {
+    //                 sh "kubectl get nodes -o wide"
+    //                 sh "kubectl get --namespace default svc my-kubeview"
+    //                 sh "kubectl get svc --namespace kubeview my-kubeview -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
+    //                 sh "kubectl --namespace prom get pods -l release=my-kube-prometheus-stack"
+    //             }
+    //         }
+    //    }
+
     }
 }
