@@ -1,5 +1,7 @@
 GLOBAL:
   namespace: vote
+  chart_version: 0.18.6.0
+  app_version: 1.18.6.0
 
 image_vote:
   repository: itay47/voting-app
