@@ -34,24 +34,23 @@ pipeline {
                 }
             }
             
-            post{
-                success{
-                    echo "====++++ build success ++++===="
-                    script{
-                        Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Success!")
-                    }
-
-                    script{
-                        sh 'docker images'
-                    }
+        post{
+            success{
+                echo "====++++ build success ++++===="
+                script{
+                    Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Success!")
                 }
-                failure{
-                    echo "====++++ build execution failed ++++===="
-                    script{
-                        Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Fail!")
-                    }
+                script{
+                    sh 'docker images'
                 }
             }
+            failure{
+                echo "====++++ build execution failed ++++===="
+                script{
+                    Telegram.sendTextTelegram("voting-app:result_$BUILD_TAG -- build Fail!")
+                }
+            }
+        }
     } 
 
     
