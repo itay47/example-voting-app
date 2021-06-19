@@ -1,3 +1,6 @@
+library identifier: 'example-voting-app@master', retriever: modernSCM(
+        [$class: 'GitSCMSource', remote: 'https://github.com/itay47/example-voting-app.git'])
+
 pipeline {
     agent {
         label 'BUILD_AGENT'
@@ -23,7 +26,7 @@ pipeline {
     stages {
         stage('gcloud config') {
             steps {
-                sh "gcloud container clusters get-credentials ${params.GKE_CLUSTER} --region ${params.GCP_REGION_NAME} --project ${params.GCP_PROJECT}"
+                sh "gcloud container clusters get-credentials ${params.GKE_CLUSTER} --region ${params.GCP_REGION} --project ${params.GCP_PROJECT}"
             }
         }
 
@@ -36,6 +39,19 @@ pipeline {
             steps {
                sh "helm delete ${params.HELM_CHART}"
             }
+            
+            post{
+                success{
+                    script{
+                        Telegram.sendTextTelegram("Helm delete ${params.HELM_CHART} -- Success!")
+                    }
+                }
+                failure{
+                    script{
+                        Telegram.sendTextTelegram("Helm delete ${params.HELM_CHART} -- Fail!")
+                    }
+                }
+            }
         }
 
         stage('gcloud delete firewall-rules') {
@@ -45,18 +61,19 @@ pipeline {
             }
         }
 
-        stage('helm delete kubeview') {
-            steps {
-                sh "helm delete my-kubeview"
-                sh "kubectl delete namespace kubeview"
-            }
-        }
+        // stage('helm delete kubeview') {
+        //     steps {
+        //         sh "helm delete my-kubeview"
+        //         sh "kubectl delete namespace kubeview"
+        //     }
+        // }
 
-        stage('helm delete prometheus-grafana') {
-            steps {
-                sh "helm delete my-kube-prometheus-stack"
-                sh "kubectl delete namespace prom"
-            }
-        }
+        // stage('helm delete prometheus-grafana') {
+        //     steps {
+        //         sh "helm delete my-kube-prometheus-stack"
+        //         sh "kubectl delete namespace prom"
+        //     }
+        // }
+
     }
 }
