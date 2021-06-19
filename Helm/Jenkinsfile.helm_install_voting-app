@@ -14,6 +14,14 @@ def set_build_number_from_date () {
     return "1.${now}"
 }
 
+//this function will update the values.yaml given element.path.name with the new value and file path  
+//REQUIRES yq to be pre-installed!
+// get at: https://github.com/mikefarah/yq
+// usage: https://mikefarah.gitbook.io/yq/commands/evaluate
+def update_values_yaml (element_path,new_val,ymal_file_path,filename) {
+    sh "yq eval '.${element_path} = \"${new_val}\"' -i ${ymal_file_path}/${filename}"
+}
+
 pipeline {
     agent any
 
@@ -23,6 +31,7 @@ pipeline {
         NEXUS_CREDS = credentials('nexus-creds')
         ARTIFACTORY_USERNAME = "$env.NEXUS_CREDS_USR"
         ARTIFACTORY_PASSWORD = "$env.NEXUS_CREDS_PSW"
+        GIT_URL = "https://github.com/itay47/example-voting-app.git"
     }
   
     parameters {
@@ -30,7 +39,7 @@ pipeline {
         string(name: 'App_Version', defaultValue: set_build_number_from_date, description: 'The Helm chart name')
         string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
         string(name: 'HELM_DIR_NAME', defaultValue: 'Helm/my-vote', description: 'The Helm directory name')
-        string(name: 'VALUES_FILE', defaultValue: 'dev-values.yaml', description: 'The Helm values file name')
+        string(name: 'VALUES_FILE', defaultValue: 'values.yaml', description: 'The Helm values file name')
         string(name: 'GKE_CLUSTER', defaultValue: 'devops-310517-gke', description: 'The GCP cluster name')
         string(name: 'GCP_PROJECT', defaultValue: 'devops-310517', description: 'The GCP project name')
         string(name: 'GCP_REGION', defaultValue: 'us-east1', description: 'The GCP region name')
@@ -40,11 +49,41 @@ pipeline {
     }
 
     stages {
+        
+        stage ('Git Checkout') {
+            steps {
+              git "$env.GIT_URL"
+            }
+        }
+
         stage('gcloud config') {
             steps {
                 sh "gcloud container clusters get-credentials ${params.GKE_CLUSTER} --region ${params.GCP_REGION} --project ${params.GCP_PROJECT}"
             }
           }
+
+        stage('update values.yaml') {
+            steps {
+                script{
+                    //${element_path} ${new_val} ${ymal_file_path} ${filename}"
+                    update_values_yaml("GLOBAL.app_version", "$params.App_Version", "$params.HELM_DIR_NAME", "$params.VALUES_FILE")
+                    sh ("cat $params.HELM_DIR_NAME/$params.VALUES_FILE")
+
+                    
+                    Telegram.sendTextTelegram("Helm chart values.yaml\napp_version update: ${$params.App_Version}")
+                }
+            }
+        }
+
+        stage('push to repository') {
+            steps{         
+                sh "git commit -a -m update_build_number:${$params.App_Version}"         
+                withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/etzi71/voting-app.git HEAD:master'){
+                    //sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/etzi71/voting-app.git HEAD:master")
+                    sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@$env.GIT_URL HEAD:master")
+                }
+            }
+        }
 
         stage('Helm package and upload to nexus3 repo') {
             steps {
@@ -101,10 +140,10 @@ pipeline {
                             def package_version = "${jsn.version}"
 
                             //test it before deploy
-                            sh ("helm install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version} --values ${HELM_DIR_NAME}/values.yaml --dry-run")
+                            sh ("helm upgrade --install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE} --dry-run")
                             
                             //deploy to GKE
-                            sh ("helm install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version} --values ${HELM_DIR_NAME}/values.yaml")
+                            sh ("helm upgrade --install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE}")
                         }
                         catch (err) {
                             echo err.getMessage()
