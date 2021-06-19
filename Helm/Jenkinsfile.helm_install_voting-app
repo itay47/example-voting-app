@@ -32,11 +32,12 @@ pipeline {
         ARTIFACTORY_USERNAME = "$env.NEXUS_CREDS_USR"
         ARTIFACTORY_PASSWORD = "$env.NEXUS_CREDS_PSW"
         GIT_URL = "https://github.com/itay47/example-voting-app.git"
+        BUILD_NUM = set_build_number_from_date()
     }
   
     parameters {
         
-        string(name: 'App_Version', defaultValue: set_build_number_from_date, description: 'The Helm chart name')
+        string(name: 'App_Version', defaultValue: "$env.BUILD_NUM" , description: 'The Helm chart name')
         string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
         string(name: 'HELM_DIR_NAME', defaultValue: 'Helm/my-vote', description: 'The Helm directory name')
         string(name: 'VALUES_FILE', defaultValue: 'values.yaml', description: 'The Helm values file name')
