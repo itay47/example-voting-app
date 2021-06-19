@@ -180,7 +180,7 @@ pipeline {
         //         }
         //     }
         // }
-
+    //
     //     stage('helm install prometheus-grafana') {
     //         steps {
     //             script {
@@ -191,7 +191,7 @@ pipeline {
     //             }
     //         }
     //     }
-
+    //
     //     stage('kubectl get nodes') {
     //         steps {
     //             script {
