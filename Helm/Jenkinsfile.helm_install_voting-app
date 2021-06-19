@@ -104,6 +104,7 @@ pipeline {
                             sh ("helm package ${params.HELM_DIR_NAME}/${params.HELM_CHART}")
                             //grab the package name
                             HELM_PACK = sh(script:"ls my-vote*",returnStdout: true).trim()
+                            echo "$HELM_PACK"
                             //move it to the correct folder - ** package name must be same as in chart **
                             sh ("mv ${HELM_PACK} Helm/")
                             //connect and push to nexus3 helm-repo:
