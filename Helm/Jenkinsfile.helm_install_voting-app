@@ -8,8 +8,11 @@ def createNamespace (namespace) {
     sh "[ ! -z \"\$(kubectl get ns ${namespace} -o name 2>/dev/null)\" ] || kubectl create ns ${namespace}"
 }
 
-
-
+def set_build_number_from_date () {
+    def now = new Date()
+    now.format("dd.MM.yy.HHmm", TimeZone.getTimeZone('UTC+3'))
+    return "1.${now}"
+}
 
 pipeline {
     agent any
@@ -23,15 +26,17 @@ pipeline {
     }
   
     parameters {
-              string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
-              string(name: 'HELM_DIR_NAME', defaultValue: 'Helm/my-vote', description: 'The Helm directory name')
-              string(name: 'VALUES_FILE', defaultValue: 'dev-values.yaml', description: 'The Helm values file name')
-              string(name: 'GKE_CLUSTER', defaultValue: 'devops-310517-gke', description: 'The GCP cluster name')
-              string(name: 'GCP_PROJECT', defaultValue: 'devops-310517', description: 'The GCP project name')
-              string(name: 'GCP_REGION', defaultValue: 'us-east1', description: 'The GCP region name')
-              string(name: 'GCP_CLUSTER_VPC', defaultValue: 'final-project', description: 'The GCP VPC name')
-              string(name: 'VOTE_PORT', defaultValue: '31000', description: 'The VOTE app port')
-              string(name: 'RESULT_PORT', defaultValue: '31001', description: 'The RESULT app port')
+        
+        string(name: 'App_Version', defaultValue: set_build_number_from_date, description: 'The Helm chart name')
+        string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
+        string(name: 'HELM_DIR_NAME', defaultValue: 'Helm/my-vote', description: 'The Helm directory name')
+        string(name: 'VALUES_FILE', defaultValue: 'dev-values.yaml', description: 'The Helm values file name')
+        string(name: 'GKE_CLUSTER', defaultValue: 'devops-310517-gke', description: 'The GCP cluster name')
+        string(name: 'GCP_PROJECT', defaultValue: 'devops-310517', description: 'The GCP project name')
+        string(name: 'GCP_REGION', defaultValue: 'us-east1', description: 'The GCP region name')
+        string(name: 'GCP_CLUSTER_VPC', defaultValue: 'final-project', description: 'The GCP VPC name')
+        string(name: 'VOTE_PORT', defaultValue: '31000', description: 'The VOTE app port')
+        string(name: 'RESULT_PORT', defaultValue: '31001', description: 'The RESULT app port')
     }
 
     stages {
