@@ -31,7 +31,7 @@ pipeline {
         NEXUS_CREDS = credentials('nexus-creds')
         ARTIFACTORY_USERNAME = "$env.NEXUS_CREDS_USR"
         ARTIFACTORY_PASSWORD = "$env.NEXUS_CREDS_PSW"
-        GIT_URL = "https://github.com/itay47/example-voting-app.git"
+        GIT_URL = "github.com/itay47/example-voting-app.git"
         BUILD_NUM = set_build_number_from_date()
     }
   
@@ -53,7 +53,7 @@ pipeline {
         
         stage ('Git Checkout') {
             steps {
-              git "$env.GIT_URL"
+              git "https://$env.GIT_URL"
             }
         }
 
