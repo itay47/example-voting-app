@@ -81,7 +81,6 @@ pipeline {
             steps{         
                 sh "git commit -a -m update_build_number:${params.App_Version}"         
                 withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    //sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/etzi71/voting-app.git HEAD:master")
                     script{
                         try {
                             sh("git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${env.GIT_URL} HEAD:master")
@@ -108,7 +107,7 @@ pipeline {
                             //move it to the correct folder - ** package name must be same as in chart **
                             sh ("mv ${HELM_PACK} Helm/")
                             //connect and push to nexus3 helm-repo:
-                            sh ("curl -u $NEXUS_CRED_USR:$NEXUS_CRED_PSW http://shechter47.mooo.com:8181/repository/helm-nexus/ --upload-file Helm/${HELM_PACK} -v")
+                            sh ("curl -u ${NEXUS_CRED_USR}:${NEXUS_CRED_PSW} http://shechter47.mooo.com:8181/repository/helm-nexus/ --upload-file Helm/${HELM_PACK} -v")
 
                             Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Success!")
 
