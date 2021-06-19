@@ -84,7 +84,7 @@ pipeline {
                     //sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/etzi71/voting-app.git HEAD:master")
                     script{
                         try {
-                            sh("git push https://$GIT_USERNAME:$GIT_PASSWORD@$env.GIT_URL HEAD:master")
+                            sh("git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${env.GIT_URL} HEAD:master")
                             Telegram.sendTextTelegram("git push ${params.VALUES_FILE}: ${params.App_Version} -- Success!")
                         }
                         catch (err) {
