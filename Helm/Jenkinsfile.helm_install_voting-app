@@ -59,6 +59,7 @@ pipeline {
 
         stage('gcloud config') {
             steps {
+                sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
                 sh "gcloud container clusters get-credentials ${params.GKE_CLUSTER} --region ${params.GCP_REGION} --project ${params.GCP_PROJECT}"
             }
           }
