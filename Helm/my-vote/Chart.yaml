@@ -24,4 +24,4 @@ worker_version: "{{ .Values.image_worker.tag | quote }}"
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-appVersion: {{ .Values.general.appVersion | quote }}
+appVersion: "{{ .Values.general.appVersion }}"
