@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: {{ .Values.general.namespace }} #vote
-  name: {{ .Values.general.namespace . }} #vote
+  name: {{ .Values.general.namespace }} #vote
   namespace: {{ .Values.general.namespace }}  #vote
 spec:
   replicas: {{ .Values.image_vote.replicas }}
