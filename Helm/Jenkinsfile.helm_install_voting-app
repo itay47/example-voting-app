@@ -153,10 +153,10 @@ pipeline {
                             def package_version = "${jsn.version}"
 
                             //test it before deploy
-                            sh ("helm upgrade --install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE} --dry-run")
+                            sh ("helm upgrade --install --name ${params.HELM_CHART} ${package_name} --version ${package_version} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE} --dry-run")
                             
                             //deploy to GKE
-                            sh ("helm upgrade --install --name ${params.HELM_CHART} helm-nexus/${package_name} --version ${package_version} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE}")
+                            sh ("helm upgrade --install --name ${params.HELM_CHART} ${package_name} --version ${package_version} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE}")
                         }
                         catch (err) {
                             echo err.getMessage()
