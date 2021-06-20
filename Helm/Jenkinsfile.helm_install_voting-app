@@ -102,7 +102,7 @@ pipeline {
                         def HELM_PACK = ''
                         try{
                             //package the chart
-                            sh ("microk8s.helm3 package ${params.HELM_DIR_NAME} --values ${params.HELM_DIR_NAME}/values.yaml")
+                            sh ("/snap/bin/microk8s.helm3 package ${params.HELM_DIR_NAME} --values ${params.HELM_DIR_NAME}/values.yaml")
                             //grab the package name
                             HELM_PACK = sh(script:"ls my-vote*",returnStdout: true).trim()
                             echo "$HELM_PACK"
