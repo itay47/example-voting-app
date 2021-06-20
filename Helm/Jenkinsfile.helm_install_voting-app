@@ -104,17 +104,17 @@ pipeline {
                             //package the chart
                             sh ("/snap/bin/microk8s.helm3 package ${params.HELM_DIR_NAME}/") // --values ${params.HELM_DIR_NAME}/values.yaml")
                             //grab the package name
-                            HELM_PACK = sh(script:"ls my-vote*", returnStdout: true).trim()
-                            echo "$HELM_PACK"
-                            //move it to the correct folder - ** package name must be same as in chart **
-                            sh ("mv ${HELM_PACK} Helm/")
-                            //connect and push to nexus3 helm-repo:
-                            sh ("curl -u ${NEXUS_CRED_USR}:${NEXUS_CRED_PSW} http://shechter47.mooo.com:8181/repository/helm-nexus/ --upload-file Helm/${HELM_PACK} -v")
+                            // HELM_PACK = sh(script:"ls my-vote*", returnStdout: true).trim()
+                            // echo "$HELM_PACK"
+                            // //move it to the correct folder - ** package name must be same as in chart **
+                            // sh ("mv ${HELM_PACK} Helm/")
+                            // //connect and push to nexus3 helm-repo:
+                            // sh ("curl -u ${NEXUS_CRED_USR}:${NEXUS_CRED_PSW} http://shechter47.mooo.com:8181/repository/helm-nexus/ --upload-file Helm/${HELM_PACK} -v")
 
-                            Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Success!")
+                            // Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Success!")
 
-                            //remove local package for cleanup
-                            sh ("rm Helm/${HELM_PACK}")
+                            // //remove local package for cleanup
+                            // sh ("rm Helm/${HELM_PACK}")
                         // }
                         // catch (err) {
                         //     echo err.getMessage()
