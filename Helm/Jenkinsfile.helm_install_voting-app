@@ -100,11 +100,11 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'NEXUS_CRED_PSW', usernameVariable: 'NEXUS_CRED_USR')]) {
                     script{
                         def HELM_PACK = ''
-                        try{
+                        //try{
                             //package the chart
                             sh ("/snap/bin/microk8s.helm3 package ${params.HELM_DIR_NAME}/") // --values ${params.HELM_DIR_NAME}/values.yaml")
                             //grab the package name
-                            HELM_PACK = sh(script:"ls my-vote*",returnStdout: true).trim()
+                            HELM_PACK = sh(script:"ls my-vote*", returnStdout: true).trim()
                             echo "$HELM_PACK"
                             //move it to the correct folder - ** package name must be same as in chart **
                             sh ("mv ${HELM_PACK} Helm/")
@@ -115,13 +115,13 @@ pipeline {
 
                             //remove local package for cleanup
                             sh ("rm Helm/${HELM_PACK}")
-                        }
-                        catch (err) {
-                            echo err.getMessage()
-                            Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Fail!")
-                            Telegram.sendTextTelegram("err: ${err.getMessage()}")
-                            error(err.getMessage())
-                        }
+                        // }
+                        // catch (err) {
+                        //     echo err.getMessage()
+                        //     Telegram.sendTextTelegram("Helm package: ${HELM_PACK} -- nexus3 upload Fail!")
+                        //     Telegram.sendTextTelegram("err: ${err.getMessage()}")
+                        //     error(err.getMessage())
+                        // }
                     }
                 }
             }
