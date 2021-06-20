@@ -143,7 +143,7 @@ pipeline {
                             //add and connect to a helm repo from artifactory:
                             //helm repo add <REPO_KEY> http://<ARTIFACTORY_HOST>:<ARTIFACTORY_PORT>/artifactory/<REPO_KEY> --username <USERNAME> --password <PASSWORD>
                             //helm repo update  <--- updates helm to use the newly added repo (acts like apt-get update)
-                            sh ("helm repo add helm-nexus http://shechter47.mooo.com:8181/repository/helm-nexus/ --username $NEXUS_CRED_USR --password $NEXUS_CRED_PSW")
+                            sh ("helm repo add helm-nexus http://shechter47.mooo.com:8181/repository/helm-nexus/ --username ${env.ARTIFACTORY_USERNAME} --password ${env.ARTIFACTORY_PASSWORD}")
                             sh ("helm repo update")
                             HELM_PACK= sh(script:"helm search repo -l --output json",returnStdout: true).trim()
                             HELM_PACK = (HELM_PACK.substring(1, HELM_PACK.length() - 1)).trim() //remove leading and trailing '[' & ']'
