@@ -16,7 +16,8 @@ spec:
         app: {{- include "my-vote.selectorLabels" . | nindent 8 }} #vote
     spec:
       containers:
-      - image: {{ .Values.image_vote.repository }}':'{{ .Values.image_vote.tag }} #{{ .Chart.AppVersion }} #itay47/voting-app:Worker_core31
+      - image: "{{ .Values.image_vote.repository }}:{{ .Values.image_vote.tag }}" #{{ .Chart.AppVersion }} #itay47/voting-app:Worker_core31
+        imagePullPolicy: {{ .Values.image_vote.pullPolicy }}
         name: {{ .Chart.Name }} #vote
         ports:
         - containerPort: {{ .Values.image_vote.targetPort }}
