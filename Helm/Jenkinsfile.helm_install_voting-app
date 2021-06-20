@@ -19,7 +19,7 @@ def set_build_number_from_date () {
 // get at: https://github.com/mikefarah/yq
 // usage: https://mikefarah.gitbook.io/yq/commands/evaluate
 def update_values_yaml (element_path,new_val,ymal_file_path,filename) {
-    echo $new_val
+    echo "${new_val}"
     sh "yq eval '.${element_path} = \"${new_val}\"' -i ${ymal_file_path}/${filename}"
 }
 
