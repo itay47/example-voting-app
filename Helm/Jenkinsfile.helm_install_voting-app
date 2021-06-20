@@ -69,7 +69,7 @@ pipeline {
             steps {
                 script{
                     //${element_path} ${new_val} ${ymal_file_path} ${filename}"
-                    update_values_yaml("GLOBAL.app_version", "${params.App_Version}", "${params.HELM_DIR_NAME}", "${params.VALUES_FILE}")
+                    update_values_yaml("general.appVersion", "${params.App_Version}", "${params.HELM_DIR_NAME}", "${params.VALUES_FILE}")
                     sh ("cat $params.HELM_DIR_NAME/$params.VALUES_FILE")
 
                     
