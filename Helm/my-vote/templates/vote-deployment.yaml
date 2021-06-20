@@ -2,18 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: {{- include "my-vote.labels" . | nindent 4 }} #vote
-  name: {{ include "my-vote.fullname" . }} #vote
-  namespace: {{ include "my-vote.namespace" }}  #vote
+    app: {{ .Values.general.namespace }} #vote
+  name: {{ .Values.general.namespace . }} #vote
+  namespace: {{ .Values.general.namespace }}  #vote
 spec:
   replicas: {{ .Values.image_vote.replicas }}
   selector:
     matchLabels:
-      app: {{- include "my-vote.selectorLabels" . | nindent 6 }} #vote
+      app: {{.Values.general.namespace }} #vote
   template:
     metadata:
       labels:
-        app: {{- include "my-vote.selectorLabels" . | nindent 8 }} #vote
+        app: {{.Values.general.namespace }} #vote
     spec:
       containers:
       - image: "{{ .Values.image_vote.repository }}:{{ .Values.image_vote.tag }}" #{{ .Chart.AppVersion }} #itay47/voting-app:Worker_core31
