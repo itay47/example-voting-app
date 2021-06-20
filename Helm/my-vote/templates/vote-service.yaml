@@ -2,9 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: {{ .Values.GLOBAL.namespace }}
-  name: {{ .Values.GLOBAL.namespace }}
-  namespace: {{ .Values.GLOBAL.namespace }}
+    app: {{ .Values.global.namespace }}
+  name: {{ .Values.global.namespace }}
+  namespace: {{ .Values.global.namespace }}
 spec:
   type: NodePort
   ports:
@@ -13,5 +13,5 @@ spec:
     targetPort: {{ .Values.image_vote.targetPort }}
     nodePort: {{ .Values.image_vote.nodePort }}
   selector:
-    app: {{ .Values.GLOBAL.namespace }}
+    app: {{ .Values.global.namespace }}
   

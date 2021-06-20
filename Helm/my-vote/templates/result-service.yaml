@@ -4,7 +4,7 @@ metadata:
   labels:
     app: result
   name: result
-  namespace: {{ .values.GLOBAL.namespace }}
+  namespace: {{ .values.global.namespace }}
 spec:
   type: NodePort
   ports:

@@ -4,7 +4,7 @@ metadata:
   labels:
     app: redis
   name: redis
-  namespace: {{ .Values.GLOBAL.namespace }}
+  namespace: {{ .Values.global.namespace }}
 spec:
   type: ClusterIP
   ports:

@@ -14,7 +14,7 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: {{ .Values.GLOBAL.chart_version }}
+version: {{ .Values.global.chartVersion }}
 
 vote_version: {{ .Values.image_vote.tag | quote }}
 result_version: {{ .Values.image_result.tag | quote }}
@@ -22,4 +22,4 @@ worker_version: {{ .Values.image_worker.tag | quote }}
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: {{ .Values.GLOBAL.app_version | quote }}
+appVersion: {{ .Values.global.appVersion | quote }}
