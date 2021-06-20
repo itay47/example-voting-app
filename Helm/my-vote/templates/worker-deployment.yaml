@@ -4,7 +4,7 @@ metadata:
   labels:
     app: worker
   name: worker
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Values.general.namespace }}
 spec:
   replicas: {{ .Values.image_worker.replicas }}
   selector:

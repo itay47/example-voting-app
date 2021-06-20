@@ -4,7 +4,7 @@ metadata:
   labels:
     app: result
   name: result
-  namespace: {{ .values.global.namespace }}
+  namespace: {{ .values.general.namespace }}
 spec:
   replicas: {{ .Values.image_result.replicas }}
   selector:

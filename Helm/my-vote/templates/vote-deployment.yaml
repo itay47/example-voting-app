@@ -20,4 +20,4 @@ spec:
         name: {{ .Chart.Name }} #vote
         ports:
         - containerPort: {{ .Values.image_vote.targetPort }}
-          name: {{ .Values.global.namespace }}
+          name: {{ .Values.general.namespace }}

@@ -1,4 +1,4 @@
-global:
+general:
   namespace: vote
   chartVersion: 0.18.6.0
   appVersion: 20.06.21.2240
