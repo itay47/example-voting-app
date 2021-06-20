@@ -77,7 +77,7 @@ pipeline {
             }
         }
 
-        stage('push to repository') {
+        stage('push to github') {
             steps{         
                 withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     script{
