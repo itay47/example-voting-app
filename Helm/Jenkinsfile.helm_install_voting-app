@@ -140,7 +140,7 @@ pipeline {
                         def HELM_PACK = ''
                         try{
                             sh ("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-                            sh ("gcloud container clusters get-credentials ${GKE_CLUSTER}")
+                            sh ("gcloud container clusters get-credentials ${GKE_CLUSTER} --region=${GCP_REGION}")
 
                             //add and connect to a helm repo from artifactory:
                             //helm repo add <REPO_KEY> http://<ARTIFACTORY_HOST>:<ARTIFACTORY_PORT>/artifactory/<REPO_KEY> --username <USERNAME> --password <PASSWORD>
