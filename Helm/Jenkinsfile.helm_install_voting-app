@@ -153,10 +153,11 @@ pipeline {
                             //def package_version = "${jsn.version}"
 
                             //test it before deploy
-                            sh ("helm upgrade --install --name ${params.HELM_CHART} ${package_name} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE} --dry-run")
+                            //helm upgrade [RELEASE] [CHART] --install -f values.yaml .. ...
+                            sh ("helm upgrade  ${params.HELM_CHART} ${package_name} --install --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE} --dry-run")
                             
                             //deploy to GKE
-                            sh ("helm upgrade --install --name ${params.HELM_CHART} ${package_name} --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE}")
+                            sh ("helm upgrade ${params.HELM_CHART} ${package_name} --install --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE}")
                         }
                         catch (err) {
                             echo err.getMessage()
