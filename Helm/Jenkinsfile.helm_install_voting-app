@@ -28,6 +28,7 @@ pipeline {
 
     environment {
         CLOUDSDK_CONFIG = "${env.WORKSPACE}"
+        KUBECONFIG = "${env.WORKSPACE}/kubeconfig"
         GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
         NEXUS_CREDS = credentials('nexus-creds')
         ARTIFACTORY_USERNAME = "$env.NEXUS_CREDS_USR"
