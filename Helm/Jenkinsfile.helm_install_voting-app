@@ -146,6 +146,9 @@ pipeline {
                             //helm repo update  <--- updates helm to use the newly added repo (acts like apt-get update)
                             sh ("helm repo add helm-nexus http://shechter47.mooo.com:8181/repository/helm-nexus/ --username ${env.ARTIFACTORY_USERNAME} --password ${env.ARTIFACTORY_PASSWORD}")
                             sh ("helm repo update")
+                            sh ("helm repo list")
+                            sh ("helm search repo -l --output json")
+                            
                             HELM_PACK= sh(script:"helm search repo -l --output json",returnStdout: true).trim()
                             HELM_PACK = (HELM_PACK.substring(1, HELM_PACK.length() - 1)).trim() //remove leading and trailing '[' & ']'
                             def jsn = readJSON text: "${HELM_PACK}"
