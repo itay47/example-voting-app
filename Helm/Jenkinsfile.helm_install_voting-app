@@ -136,10 +136,11 @@ pipeline {
 
             steps {
                 withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'nexus_pass', usernameVariable: 'nexus_user')]) {
-                    sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
                     script{
                         def HELM_PACK = ''
                         try{
+                            sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+
                             //add and connect to a helm repo from artifactory:
                             //helm repo add <REPO_KEY> http://<ARTIFACTORY_HOST>:<ARTIFACTORY_PORT>/artifactory/<REPO_KEY> --username <USERNAME> --password <PASSWORD>
                             //helm repo update  <--- updates helm to use the newly added repo (acts like apt-get update)
