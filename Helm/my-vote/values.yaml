@@ -1,6 +1,6 @@
 general:
   namespace: vote
-  appVersion: 21.06.21.1649
+  appVersion: 21.06.21.1659
 image_vote:
   repository: itay47/voting-app
   pullPolicy: "IfNotPresent"
