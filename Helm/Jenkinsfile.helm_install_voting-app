@@ -154,7 +154,7 @@ pipeline {
 
                             //test it before deploy
                             //helm upgrade [RELEASE] [CHART] --install -f values.yaml .. ...
-                            sh ("helm upgrade  ${params.HELM_CHART} ${package_name} --install --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE} --dry-run")
+                            sh ("helm upgrade ${params.HELM_CHART} ${package_name} --install --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE} --dry-run")
                             
                             //deploy to GKE
                             sh ("helm upgrade ${params.HELM_CHART} ${package_name} --install --values ${params.HELM_DIR_NAME}/${params.VALUES_FILE}")
