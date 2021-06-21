@@ -102,8 +102,8 @@ pipeline {
                     script{
                         def HELM_PACK = ''
                         try{
-                            //package the chart
-                            sh ("helm package ${params.HELM_DIR_NAME}") // --values ${params.HELM_DIR_NAME}/values.yaml")
+                            //package the chart and set the appVersion in the Chart.yaml
+                            sh ("helm package ${params.HELM_DIR_NAME} --app-version=${params.App_Version}")
                             //grab the package name
                             HELM_PACK = sh(script:"ls my-vote*", returnStdout: true).trim()
                             echo "$HELM_PACK"
