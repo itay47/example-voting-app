@@ -20,7 +20,7 @@ spec:
         app: db
     spec:
       containers:
-      - image: {{ .Values.image_db.repository }}':'{{ .Values.image_db.tag }}
+      - image: "{{ .Values.image_db.repository }}:{{ .Values.image_db.tag }}"
         name: {{ .Values.image_db.repository }} #postgres
         env:
         - name: POSTGRES_USER
