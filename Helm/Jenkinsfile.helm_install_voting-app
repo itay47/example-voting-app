@@ -49,7 +49,7 @@ pipeline {
         string(name: 'GCP_CLUSTER_VPC', defaultValue: 'final-project', description: 'The GCP VPC name')
         string(name: 'VOTE_PORT', defaultValue: '31000', description: 'The VOTE app port')
         string(name: 'RESULT_PORT', defaultValue: '31001', description: 'The RESULT app port')
-        string(name: 'PV_DISK_NAME', defaultValue: 'gce-pv-disk01', description: 'GCP persistant volume disk')
+        string(name: 'PV_DISK_NAME', defaultValue: 'gce-pv-disk01', description: 'GCP persistent volume disk')
 
     }
 
@@ -131,7 +131,7 @@ pipeline {
             }
         }
 
-        stage ('Create Persistant disk for DB'){
+        stage ('Create Persistent disk for DB'){
             steps {
                 script {
                     sh ("gcloud auth activate-service-account --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
