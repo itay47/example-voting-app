@@ -50,6 +50,7 @@ pipeline {
         string(name: 'VOTE_PORT', defaultValue: '31000', description: 'The VOTE app port')
         string(name: 'RESULT_PORT', defaultValue: '31001', description: 'The RESULT app port')
         string(name: 'PV_DISK_NAME', defaultValue: 'gce-pv-disk01', description: 'GCP persistent volume disk')
+        string(name: 'PV_ZONE', defaultValue: 'us-east1-b', description: 'GCP persistent volume disk')
 
     }
 
@@ -135,7 +136,7 @@ pipeline {
             steps {
                 script {
                     sh ("gcloud auth activate-service-account --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-                    sh ("gcloud compute disks create --size=100GB --region=${params.GCP_REGION} ${params.PV_DISK_NAME}")
+                    sh ("gcloud compute disks create --size=100GB --region=${params.GCP_REGION} --replica-zones=${params.PV_ZONE} ${params.PV_DISK_NAME}")
                 }
             }
         }  
