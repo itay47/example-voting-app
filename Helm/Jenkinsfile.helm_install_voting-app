@@ -136,7 +136,21 @@ pipeline {
             steps {
                 script {
                     sh ("gcloud auth activate-service-account --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-                    sh ("gcloud compute disks create ${params.PV_DISK_NAME} --size=100GB --zone=${params.PV_ZONE} --project=${GCP_PROJECT}")
+                    def existing_pv = sh (script:"gcloud compute disks list --filter=\"name=( gce-pv-disk01 )\" --format json",returnStdout:true).trim()
+                    existing_pv = (existing_pv.substring(1, existing_pv.length() - 1)).trim()
+                    if (existing_pv.length > 10) {
+                        //resource probva... move along...
+                        def jsn = readJSON text: "${existing_pv}"
+                        if (jsn.name == "${params.PV_DISK_NAME}")
+                        //we found the exact disk name
+                        //return a success step:
+                        Success
+                    }
+                    else{
+                        // create the resource if not already exists
+                        echo "creating a new disk: ${params.PV_DISK_NAME}"
+                        sh ("gcloud compute disks create ${params.PV_DISK_NAME} --size=100GB --zone=${params.PV_ZONE} --project=${GCP_PROJECT}")
+                    }
                 }
             }
         }  
@@ -187,14 +201,14 @@ pipeline {
             }
         }
 
-        // stage('gcloud create firewall-rules') {
-        //     steps {
-        //         //auth
-        //         sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-        //         //add ports
-        //         sh ("gcloud compute firewall-rules create node-port-${params.VOTE_PORT} --network ${params.GCP_CLUSTER_VPC} --allow tcp:${params.VOTE_PORT} --project ${params.GCP_PROJECT}")
-        //         sh ("gcloud compute firewall-rules create node-port-${params.RESULT_PORT} --network ${params.GCP_CLUSTER_VPC} --allow tcp:${params.RESULT_PORT} --project ${params.GCP_PROJECT}")
-        //     }
-        // }
+        stage('gcloud create firewall-rules') {
+            steps {
+                //auth
+                sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+                //add ports
+                sh ("gcloud compute firewall-rules create node-port-${params.VOTE_PORT} --network ${params.GCP_CLUSTER_VPC} --allow tcp:${params.VOTE_PORT} --project ${params.GCP_PROJECT}")
+                sh ("gcloud compute firewall-rules create node-port-${params.RESULT_PORT} --network ${params.GCP_CLUSTER_VPC} --allow tcp:${params.RESULT_PORT} --project ${params.GCP_PROJECT}")
+            }
+        }
     }
 }
