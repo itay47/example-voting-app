@@ -74,11 +74,6 @@ spec:
   gcePersistentDisk:
     pdName: {{ .Values.image_db.pdName }}
     fsType: ext4
-    # volumeMounts: 
-    #   - mountPath: {{ .Values.image_db.storage_path}}
-  ##hostPath:
-    ##pre-created folder on the following path + took ownership
-    ##path: {{ .Values.image_db.storage_path }} #"/mnt/k8s-pv-data"
 
 ##########################################
 # create a Persistant Volume Claim (PVC) #

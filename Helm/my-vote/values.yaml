@@ -35,4 +35,3 @@ image_db:
   env_user: postgres
   env_pass: postgres
   pdName: "gce-pv-disk01"
-  #storage_path: "/my-vote/db-pv" #/mnt/disks/ssd0
