@@ -44,7 +44,7 @@ spec:
 ##########################
 ---
 kind: StorageClass
-apiVersion: v1 #storage.k8s.io/v1
+apiVersion: storage.k8s.io/v1 #v1
 metadata:
   name: pgsql-pv-strgclass
   namespace: {{ .Values.general.namespace }}
