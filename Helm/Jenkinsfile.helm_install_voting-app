@@ -146,8 +146,6 @@ pipeline {
                         //return a success step:
                         echo "Disk: ${params.PV_DISK_NAME} already exist"
                         Telegram.sendTextTelegram("Disk: ${params.PV_DISK_NAME} already exist")
-                        
-                        Success
                     }
                     else{
                         // create the resource if not already exists
@@ -220,8 +218,6 @@ pipeline {
                         //return a success step:
                         echo "ports: node-port-${params.VOTE_PORT} & node-port-${params.RESULT_PORT} already exist"
                         Telegram.sendTextTelegram("ports: node-port-${params.VOTE_PORT}\nnode-port-${params.RESULT_PORT}\nAlready exist")
-
-                        Success
                     }
                     else{
                         // create the resource if not already exists
