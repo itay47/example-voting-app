@@ -136,7 +136,7 @@ pipeline {
             steps {
                 script {
                     sh ("gcloud auth activate-service-account --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-                    def existing_pv = sh (script:"gcloud compute disks list --filter=\"name=( gce-pv-disk01 )\" --format json",returnStdout:true).trim()
+                    def existing_pv = sh (script:"gcloud compute disks list --filter=\"name=( gce-pv-disk01 )\" --format json --project=${GCP_PROJECT} --region=${GCP_REGION}",returnStdout:true).trim()
                     existing_pv = (existing_pv.substring(1, existing_pv.length() - 1)).trim()
                     if (existing_pv.length > 10) {
                         //resource probva... move along...
@@ -210,7 +210,7 @@ pipeline {
                 script{
                     //auth
                     sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-                    def existing_ports = sh (script:"gcloud compute firewall-rules list --filter=\"name=( node-port-${params.VOTE_PORT}, node-port-${params.RESULT_PORT} )\" --format json",returnStdout:true).trim()
+                    def existing_ports = sh (script:"gcloud compute firewall-rules list --filter=\"name=( node-port-${params.VOTE_PORT}, node-port-${params.RESULT_PORT} )\" --format json --project=${GCP_PROJECT} --region=${GCP_REGION}",returnStdout:true).trim()
                     existing_ports = (existing_ports.substring(1, existing_ports.length() - 1)).trim()
                     if (existing_ports.length > 10) {
                         //resource probably exists... move along...
@@ -220,7 +220,7 @@ pipeline {
                         //return a success step:
                         echo "ports: node-port-${params.VOTE_PORT} & node-port-${params.RESULT_PORT} already exist"
                         Telegram.sendTextTelegram("ports: node-port-${params.VOTE_PORT}\nnode-port-${params.RESULT_PORT}\nAlready exist")
-                        
+
                         Success
                     }
                     else{
