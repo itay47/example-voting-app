@@ -136,7 +136,7 @@ pipeline {
             steps {
                 script {
                     sh ("gcloud auth activate-service-account --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
-                    sh ("gcloud compute disks create ${params.PV_DISK_NAME} --size=100GB --region=${params.GCP_REGION} --zone=${params.PV_ZONE}")
+                    sh ("gcloud compute disks create ${params.PV_DISK_NAME} --size=100GB --zone=${params.PV_ZONE}")
                 }
             }
         }  
