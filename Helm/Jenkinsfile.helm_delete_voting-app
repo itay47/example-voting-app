@@ -139,8 +139,8 @@ pipeline {
                         //we found the exact 2 firewall rules
                         //return a success step:
                         echo "ports: node-port-${params.VOTE_PORT} & node-port-${params.RESULT_PORT} - firewall rules found"
-                        sh ("gcloud compute firewall-rules delete node-port-${params.VOTE_PORT} --network ${params.GCP_CLUSTER_VPC} --project ${params.GCP_PROJECT}")
-                        sh ("gcloud compute firewall-rules delete node-port-${params.RESULT_PORT} --network ${params.GCP_CLUSTER_VPC} --project ${params.GCP_PROJECT}")
+                        sh ("gcloud compute firewall-rules delete node-port-${params.VOTE_PORT}")
+                        sh ("gcloud compute firewall-rules delete node-port-${params.RESULT_PORT}")
                         Telegram.sendTextTelegram("ports: node-port-${params.VOTE_PORT}\nnode-port-${params.RESULT_PORT}\n-deleted")
                     }
                     else{
