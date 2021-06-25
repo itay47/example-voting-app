@@ -1,65 +1,155 @@
 library identifier: 'example-voting-app@master', retriever: modernSCM(
         [$class: 'GitSCMSource', remote: 'https://github.com/itay47/example-voting-app.git'])
 
+//Create the kubernetes namespace
+def createNamespace (namespace) {
+    echo "Creating namespace ${namespace} if needed"
+
+    sh "[ ! -z \"\$(kubectl get ns ${namespace} -o name 2>/dev/null)\" ] || kubectl create ns ${namespace}"
+}
+
+def set_build_number_from_date () {
+    def now = new Date()
+    now.format("dd.MM.yy.HHmm", TimeZone.getTimeZone('UTC+3'))
+    return "1.${now}"
+}
+
+//this function will update the values.yaml given element.path.name with the new value and file path  
+//REQUIRES yq to be pre-installed!
+// get at: https://github.com/mikefarah/yq
+// usage: https://mikefarah.gitbook.io/yq/commands/evaluate
+def update_values_yaml (element_path,new_val,ymal_file_path,filename) {
+    echo "${new_val}"
+    sh "yq eval '.${element_path} = \"${new_val}\"' -i ${ymal_file_path}/${filename}"
+}
+
 pipeline {
-    agent {
-        label 'BUILD_AGENT'
-    }
+    agent any
 
     environment {
         CLOUDSDK_CONFIG = "${env.WORKSPACE}"
+        KUBECONFIG = "${env.WORKSPACE}/kubeconfig"
         GOOGLE_APPLICATION_CREDENTIALS = credentials('gCloud_ServiceAccount')
+        NEXUS_CREDS = credentials('nexus-creds')
+        ARTIFACTORY_USERNAME = "$env.NEXUS_CREDS_USR"
+        ARTIFACTORY_PASSWORD = "$env.NEXUS_CREDS_PSW"
+        GIT_URL = "github.com/itay47/example-voting-app.git"
+        BUILD_NUM = set_build_number_from_date()
     }
   
     parameters {
-              string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
-              string(name: 'HELM_DIR_NAME', defaultValue: 'Helm/my-vote', description: 'The Helm directory name')
-              string(name: 'VALUES_FILE', defaultValue: 'dev-values.yaml', description: 'The Helm values file name')
-              string(name: 'GKE_CLUSTER', defaultValue: 'devops-310517-gke', description: 'The GCP cluster name')
-              string(name: 'GCP_PROJECT', defaultValue: 'devops-310517', description: 'The GCP project name')
-              string(name: 'GCP_REGION', defaultValue: 'us-east1', description: 'The GCP region name')
-              string(name: 'GCP_CLUSTER_VPC', defaultValue: 'final-project', description: 'The GCP VPC name')
-              string(name: 'VOTE_PORT', defaultValue: '31000', description: 'The VOTE app port')
-              string(name: 'RESULT_PORT', defaultValue: '31001', description: 'The RESULT app port')
+        
+        string(name: 'App_Version', defaultValue: "$env.BUILD_NUM" , description: 'The Helm chart name')
+        string(name: 'HELM_CHART', defaultValue: 'voting-app', description: 'The Helm chart name')
+        string(name: 'HELM_DIR_NAME', defaultValue: 'Helm/my-vote', description: 'The Helm directory name')
+        string(name: 'VALUES_FILE', defaultValue: 'values.yaml', description: 'The Helm values file name')
+        string(name: 'GKE_CLUSTER', defaultValue: 'devops-310517-gke', description: 'The GCP cluster name')
+        string(name: 'GCP_PROJECT', defaultValue: 'devops-310517', description: 'The GCP project name')
+        string(name: 'GCP_REGION', defaultValue: 'us-east1', description: 'The GCP region name')
+        string(name: 'GCP_CLUSTER_VPC', defaultValue: 'final-project', description: 'The GCP VPC name')
+        string(name: 'VOTE_PORT', defaultValue: '31000', description: 'The VOTE app port')
+        string(name: 'RESULT_PORT', defaultValue: '31001', description: 'The RESULT app port')
+        string(name: 'PV_DISK_NAME', defaultValue: 'gce-pv-disk01', description: 'GCP persistent volume disk')
+        string(name: 'PV_ZONE', defaultValue: 'us-east1-b', description: 'GCP persistent volume disk')
+
     }
 
     stages {
+        
+        stage ('Git Checkout') {
+            steps {
+              git "https://$env.GIT_URL"
+            }
+        }
+
         stage('gcloud config') {
             steps {
-                sh "gcloud container clusters get-credentials ${params.GKE_CLUSTER} --region ${params.GCP_REGION} --project ${params.GCP_PROJECT}"
+                sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+                //sh ("gcloud container clusters get-credentials ${params.GKE_CLUSTER} --region ${params.GCP_REGION} --project ${params.GCP_PROJECT}")
             }
-        }
+          } 
 
-        stage('Helm delete vote') {
+ 
 
-            input{
-                message "You are about to delete ${params.HELM_CHART}\nAre you sure?"
+        stage('Helm Delete voting-app') {
+
+            input {
+                message "uninstall app?"
             }
 
             steps {
-               sh "helm delete ${params.HELM_CHART}"
-            }
-            
-            post{
-                success{
-                    script{
-                        Telegram.sendTextTelegram("Helm delete ${params.HELM_CHART} -- Success!")
+                script{
+                    def HELM_PACK = ''
+                    try{
+                        sh ("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+                        sh ("gcloud container clusters get-credentials ${GKE_CLUSTER} --project=${GCP_PROJECT} --region=${GCP_REGION}")
+                        //delete from to GKE
+                        sh ("helm delete ${params.HELM_CHART}")
                     }
-                }
-                failure{
-                    script{
-                        Telegram.sendTextTelegram("Helm delete ${params.HELM_CHART} -- Fail!")
+                    catch (err) {
+                        echo err.getMessage()
+                        Telegram.sendTextTelegram("Failed to uninstall Helm package: ${params.HELM_CHART}")
+                        Telegram.sendTextTelegram("err: ${err.getMessage()}")
                     }
                 }
             }
         }
+          
+        stage ('Delete Persistent disk for DB'){
+            steps {
+                script {
+                    sh ("gcloud auth activate-service-account --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+                    def existing_pv = sh (script:"gcloud compute disks list --filter=\"name=( gce-pv-disk01 )\" --format json --project=${GCP_PROJECT}",returnStdout:true).trim()
+                    existing_pv = (existing_pv.substring(1, existing_pv.length() - 1)).trim()
+                    if (existing_pv.length() > 10) {
+                        //resource exists... 
+                        def jsn = readJSON text: "${existing_pv}"
+                        if (jsn.name == "${params.PV_DISK_NAME}")
+                        //we found the exact disk name
+                        //return a success step:
+                        echo "Disk: ${params.PV_DISK_NAME} was found"
+                        echo "Removing disk: ${params.PV_DISK_NAME}"
+                        
+                        sh ("gcloud compute disks delete ${params.PV_DISK_NAME} --zone=${params.PV_ZONE} --project=${GCP_PROJECT}")
+                        Telegram.sendTextTelegram("Disk: ${params.PV_DISK_NAME} - deleted")
+                    }
+                    else{
+                        // resource not exist
+                        echo "Disk: ${params.PV_DISK_NAME} - not found"
+                        Telegram.sendTextTelegram("Disk: ${params.PV_DISK_NAME} - not found")
+                    }
+                }
+            }
+        } 
 
         stage('gcloud delete firewall-rules') {
             steps {
-                sh "gcloud compute firewall-rules delete node-port-${params.VOTE_PORT}"
-                sh "gcloud compute firewall-rules delete node-port-${params.RESULT_PORT}"
+                script{
+                    //auth
+                    sh("gcloud auth activate-service-account  --key-file=${env.GOOGLE_APPLICATION_CREDENTIALS}")
+                    def existing_ports = sh (script:"gcloud compute firewall-rules list --filter=\"name=( node-port-${params.VOTE_PORT}, node-port-${params.RESULT_PORT} )\" --format json --project=${GCP_PROJECT}",returnStdout:true).trim()
+                    //existing_ports = (existing_ports.substring(1, existing_ports.length() - 1)).trim()
+                    if (existing_ports.length() > 10) {
+                        //resource probably exists... move along...
+                        def jsn = readJSON text: "${existing_ports}"
+                        echo jsn[0].name
+                        echo jsn[1].name
+
+                        if (jsn[0].name == "node-port-${params.VOTE_PORT}" && jsn[1].name == "node-port-${params.RESULT_PORT}")
+                        //we found the exact 2 firewall rules
+                        //return a success step:
+                        echo "ports: node-port-${params.VOTE_PORT} & node-port-${params.RESULT_PORT} - firewall rules found"
+                        sh ("gcloud compute firewall-rules delete node-port-${params.VOTE_PORT} --network ${params.GCP_CLUSTER_VPC} --project ${params.GCP_PROJECT}")
+                        sh ("gcloud compute firewall-rules delete node-port-${params.RESULT_PORT} --network ${params.GCP_CLUSTER_VPC} --project ${params.GCP_PROJECT}")
+                        Telegram.sendTextTelegram("ports: node-port-${params.VOTE_PORT}\nnode-port-${params.RESULT_PORT}\n-deleted")
+                    }
+                    else{
+                        // create the resource if not already exists
+                        echo "could not found rules: node-port-${params.VOTE_PORT} & node-port-${params.RESULT_PORT}"
+                        Telegram.sendTextTelegram("could not delete firewall rules: node-port-${params.VOTE_PORT} & node-port-${params.RESULT_PORT}")
+                    }
+                }
             }
         }
-        
     }
 }
